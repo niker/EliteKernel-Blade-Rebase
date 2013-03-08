@@ -367,7 +367,11 @@ LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include \
 KBUILD_CPPFLAGS := -D__KERNEL__
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 KBUILD_CFLAGS   := -Wall -Wundef -Wno-trigraphs \
+=======
+KBUILD_CFLAGS   := -Werror -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
+>>>>>>> 37514d9... BIG FAT warning cleanup
 =======
 KBUILD_CFLAGS   := -Werror -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 >>>>>>> 37514d9... BIG FAT warning cleanup
@@ -569,7 +573,11 @@ ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS	+= -Os -Wno-address
 else
 <<<<<<< HEAD
+<<<<<<< HEAD
 KBUILD_CFLAGS	+= -O3 -ffast-math -pipe -Wno-address -Wno-unused-function -Wno-unused-variable
+=======
+KBUILD_CFLAGS	+= -O3 -Wno-address
+>>>>>>> 37514d9... BIG FAT warning cleanup
 =======
 KBUILD_CFLAGS	+= -O3 -Wno-address
 >>>>>>> 37514d9... BIG FAT warning cleanup
