@@ -56,7 +56,6 @@ extern int mpdecision_gmode_notifier(void);
 #endif
 
 // make these vals modifiable in realtime
-unsigned int T3_LP_MAX_FREQ = DEF_T3_LP_MAX_FREQ;
 unsigned int T3_CPU_MIN_FREQ = DEF_T3_CPU_MIN_FREQ;
 
 /* EliteKernel Extreme Powersaving*/
