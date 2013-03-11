@@ -22,6 +22,10 @@
 #include "cpu-tegra.h"
 #include "fuse.h"
 
+#include "tegra_pmqos.h"
+#include "../sound/soc/codecs/tlv320aic3008.h"
+
+
 #define htc_perf_attr(attrbute) 				\
 static struct kobj_attribute attrbute##_attr = {	\
 	.attr	= {					\
@@ -71,6 +75,69 @@ static ssize_t cpu_temp_store(struct kobject *kobj,
 
 htc_perf_attr(cpu_temp);
 
+static ssize_t power_save_show(struct kobject *kobj,
+		struct kobj_attribute *attr, char *buf)
+{
+	char value = 'N';
+
+	if(tegra_pmqos_powersave == 1)
+		value = 'Y';
+
+	return sprintf(buf, "%c\n", value);
+}
+
+static ssize_t power_save_store(struct kobject *kobj,
+		struct kobj_attribute *attr, const char *buf, size_t count)
+{
+	char value;
+	sscanf(buf, "%c", &value);
+
+	switch(value) {
+	case 'n':
+	case 'N':
+		if (tegra_pmqos_powersave == 1) {
+			tegra_pmqos_powersave = 0;
+			update_tegra_pmqos_freqs();
+			if(tegra_pmqos_audio == 1)
+			{
+				pm_qos_update_request(&aud_cpu_minfreq_req, (s32)T3_CPU_MIN_FREQ);
+			}
+		}
+		break;
+
+	case 'y':
+	case 'Y':
+		if (tegra_pmqos_powersave == 0) {
+			tegra_pmqos_powersave = 1;
+			update_tegra_pmqos_freqs();
+			if(tegra_pmqos_audio == 1)
+			{
+				pm_qos_update_request(&aud_cpu_minfreq_req, (s32)T3_CPU_MIN_FREQ);
+			}
+			
+
+		}
+		break;
+	case 't':
+	case 'T':
+		if(tegra_pmqos_powersave == 0) {
+			tegra_pmqos_powersave = 1;
+			update_tegra_pmqos_freqs();
+			if(tegra_pmqos_audio == 1)
+			{
+				pm_qos_update_request(&aud_cpu_minfreq_req, (s32)T3_CPU_MIN_FREQ);
+			}
+		}
+		break;
+	default:
+		pr_info("[htc_perf] Default, return;");
+		break;
+	}
+
+	return count;
+}
+
+htc_perf_attr(power_save);
 static unsigned int cpu_debug_on = 0;
 
 static ssize_t cpu_debug_show(struct kobject *kobj,
@@ -98,8 +165,23 @@ unsigned int get_cpu_debug(void)
 }
 EXPORT_SYMBOL(get_cpu_debug);
 
+void restoreCap(int on)
+{
+
+}
+EXPORT_SYMBOL(restoreCap);
+
+unsigned int get_powersave_freq(){
+
+    if (tegra_pmqos_powersave == 1)
+        return T3_LP_MAX_FREQ;
+
+    return 0;
+}
+EXPORT_SYMBOL(get_powersave_freq);
 static struct attribute * g[] = {
 	&cpu_temp_attr.attr,
+	&power_save_attr.attr,
 	&cpu_debug_attr.attr,
 	&cpuiddq_attr.attr,
 	NULL,

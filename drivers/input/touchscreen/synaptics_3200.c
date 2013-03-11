@@ -162,6 +162,7 @@ int s2w_register_threshold = 9;
 int s2w_min_distance = 325;
 // use either direction for on/off
 int s2w_allow_stroke = 1;
+// on-off switch
 int s2w_switch = 1;
 bool scr_suspended = false;
 bool exec_count = true;

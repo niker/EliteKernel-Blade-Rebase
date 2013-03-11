@@ -56,7 +56,7 @@ static unsigned int ideal_freq;
  * Zero disables and causes to always jump straight to max frequency.
  * When below the ideal freqeuncy we always ramp up to the ideal freq.
  */
-#define DEFAULT_RAMP_UP_STEP 250000
+#define DEFAULT_RAMP_UP_STEP 204000
 static unsigned int ramp_up_step;
 
 /*
@@ -64,13 +64,13 @@ static unsigned int ramp_up_step;
  * Zero disables and will calculate ramp down according to load heuristic.
  * When above the ideal freqeuncy we always ramp down to the ideal freq.
  */
-#define DEFAULT_RAMP_DOWN_STEP 250000
+#define DEFAULT_RAMP_DOWN_STEP 204000
 static unsigned int ramp_down_step;
 
 /*
  * CPU freq will be increased if measured load > max_cpu_load;
  */
-#define DEFAULT_MAX_CPU_LOAD 80
+#define DEFAULT_MAX_CPU_LOAD 94
 static unsigned int max_cpu_load;
 
 /*
@@ -83,28 +83,28 @@ static unsigned int min_cpu_load;
  * The minimum amount of time to spend at a frequency before we can ramp up.
  * Notice we ignore this when we are below the ideal frequency.
  */
-#define DEFAULT_UP_RATE_US 20000
+#define DEFAULT_UP_RATE_US 100000
 static unsigned int up_rate_us;
 
 /*
  * The minimum amount of time to spend at a frequency before we can ramp down.
  * Notice we ignore this when we are above the ideal frequency.
  */
-#define DEFAULT_DOWN_RATE_US 40000
+#define DEFAULT_DOWN_RATE_US 125000
 static unsigned int down_rate_us;
 
 #define DEFAULT_SAMPLING_RATE 50000
 static unsigned int sampling_rate;
 
-#define DEFAULT_INPUT_BOOST_DURATION 50000000
+#define DEFAULT_INPUT_BOOST_DURATION 10000000
 static unsigned int input_boost_duration;
 
-static unsigned int touch_poke_freq = 1300000;
+static unsigned int touch_poke_freq = 760000;
 static bool touch_poke = true;
 
 static bool sync_cpu_downscale = false;
 
-static unsigned int boost_freq = 1300000;
+static unsigned int boost_freq = 760000;
 static bool boost = true;
 static unsigned int boost_duration = 0;
 
@@ -112,7 +112,7 @@ static unsigned int boost_duration = 0;
 #define DEFAULT_IO_IS_BUSY 1
 static unsigned int io_is_busy;
 
-#define DEFAULT_IGNORE_NICE 1
+#define DEFAULT_IGNORE_NICE 0
 static unsigned int ignore_nice;
 
 /*************** End of tunables ***************/

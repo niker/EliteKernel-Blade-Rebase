@@ -54,7 +54,7 @@ extern unsigned int best_core_to_turn_up (void);
 #define TEGRA_MPDEC_PAUSE                 10000
 
 /* will be overwritten later by lpcpu max clock */
-#define TEGRA_MPDEC_IDLE_FREQ             T3_LP_MAX_FREQ
+unsigned int TEGRA_MPDEC_IDLE_FREQ;
 
 /* This rq value will be used if we only have the lpcpu online */
 #define TEGRA_MPDEC_LPCPU_RQ_DOWN         36
@@ -114,7 +114,7 @@ static struct tegra_mpdec_tuners {
 	.startdelay = TEGRA_MPDEC_STARTDELAY,
 	.delay = TEGRA_MPDEC_DELAY,
 	.pause = TEGRA_MPDEC_PAUSE,
-	.idle_freq = TEGRA_MPDEC_IDLE_FREQ,
+	.idle_freq = 475000,
         .lp_cpu_up_hysteresis = TEGRA_MPDEC_LPCPU_UP_HYS,
         .lp_cpu_down_hysteresis = TEGRA_MPDEC_LPCPU_DOWN_HYS,
         .max_cpus = CONFIG_NR_CPUS,
@@ -964,6 +964,8 @@ static struct notifier_block max_cpus_notifier = {
 static int __init tegra_mpdec_init(void)
 {
 	int cpu, rc, err = 0;
+
+	TEGRA_MPDEC_IDLE_FREQ = T3_LP_MAX_FREQ;
 
 	cpu_clk = clk_get_sys(NULL, "cpu");
 	cpu_g_clk = clk_get_sys(NULL, "cpu_g");

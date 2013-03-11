@@ -55,6 +55,13 @@
 extern int mpdecision_gmode_notifier(void);
 #endif
 
+// make these vals modifiable in realtime
+unsigned int T3_LP_MAX_FREQ = DEF_T3_LP_MAX_FREQ;
+unsigned int T3_CPU_MIN_FREQ = DEF_T3_CPU_MIN_FREQ;
+
+/* EliteKernel Extreme Powersaving*/
+unsigned int tegra_pmqos_powersave = 0;
+unsigned int tegra_pmqos_audio = 0;
 unsigned int tegra_pmqos_boost_freq = BOOST_CPU_FREQ_MIN;
 
 /* frequency cap used during suspend (screen off)*/

@@ -36,7 +36,7 @@
 #include <linux/usb/ch9.h>
 #include <linux/usb/f_mtp.h>
 
-#define MTP_BULK_BUFFER_SIZE       16384
+#define MTP_BULK_BUFFER_SIZE       131072
 #define INTR_BUFFER_SIZE           28
 
 /* String IDs */
@@ -72,6 +72,7 @@ static int mtp_qos;
 static struct pm_qos_request_list mtp_req_freq;
 static struct pm_qos_request_list req_cpus;
 
+static int release_screen_off_flag;
 static struct work_struct mtp_perf_lock_on_work;
 
 static const char mtp_shortname[] = "mtp_usb";
@@ -302,13 +303,21 @@ static void mtp_setup_perflock()
 	del_timer(&dev->perf_timer);
 	if (dev->mtp_perf_lock_on) {
 		printk(KERN_INFO "[USB][MTP] %s, perf on\n", __func__);
-		pm_qos_update_request(&mtp_req_freq, (s32)PM_QOS_CPU_USB_FREQ_MAX_DEFAULT_VALUE);
-		pm_qos_update_request(&req_cpus, (s32)PM_QOS_MIN_ONLINE_CPUS_USB_TWO_VALUE);
+		if (release_screen_off_flag) {
+			//release_screen_off_freq_lock(PM_QOS_CPU_FREQ_MAX_DEFAULT_VALUE);
+			release_screen_off_flag = 0;
+		}
+		//pm_qos_update_request(&mtp_req_freq, (s32)PM_QOS_CPU_FREQ_MAX_DEFAULT_VALUE);
+		//pm_qos_update_request(&req_cpus, (s32)PM_QOS_MAX_ONLINE_CPUS_DEFAULT_VALUE);
 
 	} else {
 		printk(KERN_INFO "[USB][MTP] %s, perf off\n", __func__);
-		pm_qos_update_request(&mtp_req_freq, (s32)PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
-		pm_qos_update_request(&req_cpus, (s32)PM_QOS_MIN_ONLINE_CPUS_DEFAULT_VALUE);
+		//pm_qos_update_request(&mtp_req_freq, (s32)PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
+		//pm_qos_update_request(&req_cpus, (s32)PM_QOS_MIN_ONLINE_CPUS_DEFAULT_VALUE);
+		if (!release_screen_off_flag) {
+			//lock_screen_off_freq_lock();
+			release_screen_off_flag = 1;
+		}
 	}
 }
 /* 50 ms per file */
