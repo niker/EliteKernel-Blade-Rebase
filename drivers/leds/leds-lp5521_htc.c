@@ -38,6 +38,10 @@
 	#define I(x...)
 #endif
 
+#ifdef LEDS_LP5521_HTC_multiplier
+#include <linux/leds-lp5521_htc_multiplier.h>
+#endif
+
 static int led_rw_delay;
 static int current_state, current_blink, current_time;
 static int current_currents, current_lut_coefficient, current_pwm_coefficient;
@@ -1150,8 +1154,30 @@ static ssize_t lp5521_led_off_timer_store(struct device *dev,
 	if (sec < 0 || sec > 255)
 		return -EINVAL;
 
+	#ifdef LEDS_LP5521_HTC_multiplier
+		switch (off_timer_multiplier) {
+			case OFF_TIMER_INFINITE:	{
+								/* If infinate notification set, don't set any timer */
+								LED_INFO_LOG("Not setting %s off_timer to %d min %d sec\n",
+													 led_cdev->name, min, sec);
+								return -EINVAL;
+							}
+			case OFF_TIMER_NORMAL:		{
+								LED_INFO_LOG("Setting %s off_timer to %d min %d sec\n",
+												   led_cdev->name, min, sec);
 
-	off_timer = min * 60 + sec;
+								off_timer = min * 60 + sec;
+							}
+			default:			{
+								LED_INFO_LOG("Setting %s off_timer to %d min %d sec multiplied by %d\n",
+												   led_cdev->name, min, sec, off_timer_multiplier);
+
+								off_timer = (min * 60 + sec) * off_timer_multiplier;
+							}
+		}
+	#else
+		off_timer = min * 60 + sec;
+	#endif
 
 	if(off_timer) {
 		if(!strcmp(ldata->cdev.name, "green"))	 {

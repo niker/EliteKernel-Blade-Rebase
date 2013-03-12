@@ -104,6 +104,11 @@ static ssize_t power_save_store(struct kobject *kobj,
 			{
 				pm_qos_update_request(&aud_cpu_minfreq_req, (s32)T3_CPU_MIN_FREQ);
 			}
+			else
+			{
+				pm_qos_update_request(&aud_cpu_minfreq_req, (s32)PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
+			}
+			
 			if(tegra_pmqos_powersave == 1)
 			{
 		        pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PS_T3_CPU_MAX_FREQ);
@@ -127,6 +132,11 @@ static ssize_t power_save_store(struct kobject *kobj,
 			{
 				pm_qos_update_request(&aud_cpu_minfreq_req, (s32)T3_CPU_MIN_FREQ);
 			}
+			else
+			{
+				pm_qos_update_request(&aud_cpu_minfreq_req, (s32)PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
+			}
+			
 			if(tegra_pmqos_powersave == 1)
 			{
 		        pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PS_T3_CPU_MAX_FREQ);
@@ -149,6 +159,11 @@ static ssize_t power_save_store(struct kobject *kobj,
 			{
 				pm_qos_update_request(&aud_cpu_minfreq_req, (s32)T3_CPU_MIN_FREQ);
 			}
+			else
+			{
+				pm_qos_update_request(&aud_cpu_minfreq_req, (s32)PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
+			}
+			
 			if(tegra_pmqos_powersave == 1)
 			{
 		        pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PS_T3_CPU_MAX_FREQ);
