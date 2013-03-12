@@ -13,6 +13,7 @@
  * GNU General Public License for more details.
  *
  * S2W, free swipe and stroke support modified by NIKER, 2012
+ * S2W sysfs interface by Maxwen, 2012
  */
 
 #include <linux/module.h>

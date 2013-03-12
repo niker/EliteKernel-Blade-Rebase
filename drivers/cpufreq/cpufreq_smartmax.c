@@ -93,19 +93,19 @@ static unsigned int up_rate_us;
 #define DEFAULT_DOWN_RATE_US 125000
 static unsigned int down_rate_us;
 
-#define DEFAULT_SAMPLING_RATE 50000
+#define DEFAULT_SAMPLING_RATE 40000
 static unsigned int sampling_rate;
 
 #define DEFAULT_INPUT_BOOST_DURATION 10000000
 static unsigned int input_boost_duration;
 
-static unsigned int touch_poke_freq = 760000;
+static unsigned int touch_poke_freq = 1150000;
 static bool touch_poke = true;
 
 static bool sync_cpu_downscale = false;
 
 static unsigned int boost_freq = 760000;
-static bool boost = true;
+static bool boost = false;
 static unsigned int boost_duration = 0;
 
 /* Consider IO as busy */

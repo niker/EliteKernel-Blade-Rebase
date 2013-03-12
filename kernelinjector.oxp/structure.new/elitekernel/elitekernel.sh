@@ -25,30 +25,33 @@ mount -o remount,ro /system
 echo "sio" > /sys/block/mmcblk0/queue/scheduler
 echo "sio" > /sys/block/mmcblk1/queue/scheduler
 
+# activate delayed config to override ROM
+/system/xbin/busybox nohup /system/bin/sh /elitekernel/elitekernel_delayed.sh 2>&1 >/dev/null &
+
 # need to enable all CPU cores in order to set them up
-#echo 4 > /sys/power/pnpmgr/hotplug/min_on_cpus
-#sleep 2
+echo 4 > /sys/power/pnpmgr/hotplug/min_on_cpus
+sleep 3
 
 # set governors
-#echo "ondemand" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-#echo "ondemand" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
-#echo "ondemand" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
-#echo "ondemand" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor
+echo "smartmax" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+echo "smartmax" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
+echo "smartmax" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
+echo "smartmax" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor
 
 # set default speeds (cpus activate in order 0-3-2-1)
-#echo "1400000" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
-#echo "1700000" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
-#echo "1600000" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq
-#echo "1500000" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq
+echo "1500000" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+echo "1500000" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
+echo "1500000" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq
+echo "1500000" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq
 
-#echo "51000" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-#echo "51000" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
-#echo "51000" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq
-#echo "51000" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq
+echo "51000" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+echo "51000" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
+echo "51000" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq
+echo "51000" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq
 
 # reset core activation to default
-#sleep 1 
-#echo 0 > /sys/power/pnpmgr/hotplug/min_on_cpus
+sleep 1 
+echo 0 > /sys/power/pnpmgr/hotplug/min_on_cpus
 
 # set ondemand prefs
 echo "80" > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold
@@ -101,9 +104,5 @@ echo "2048" > /sys/block/mmcblk0/queue/read_ahead_kb;
 
 # feed urandom data to /dev/random to avoid system blocking (potential security risk, use at own peril!)
 /elitekernel/rngd --rng-device=/dev/urandom --random-device=/dev/random --background --feed-interval=60
-
-# activate delayed config to override ROM
-/system/xbin/busybox nohup /system/bin/sh /elitekernel/elitekernel_delayed.sh 2>&1 >/dev/null &
-
 
 
