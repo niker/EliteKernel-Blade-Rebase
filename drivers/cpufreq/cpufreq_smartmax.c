@@ -56,7 +56,7 @@ static unsigned int ideal_freq;
  * Zero disables and causes to always jump straight to max frequency.
  * When below the ideal freqeuncy we always ramp up to the ideal freq.
  */
-#define DEFAULT_RAMP_UP_STEP 340000
+#define DEFAULT_RAMP_UP_STEP 250000
 static unsigned int ramp_up_step;
 
 /*
@@ -64,7 +64,7 @@ static unsigned int ramp_up_step;
  * Zero disables and will calculate ramp down according to load heuristic.
  * When above the ideal freqeuncy we always ramp down to the ideal freq.
  */
-#define DEFAULT_RAMP_DOWN_STEP 51000
+#define DEFAULT_RAMP_DOWN_STEP 150000
 static unsigned int ramp_down_step;
 
 /*
@@ -76,7 +76,7 @@ static unsigned int max_cpu_load;
 /*
  * CPU freq will be decreased if measured load < min_cpu_load;
  */
-#define DEFAULT_MIN_CPU_LOAD 55
+#define DEFAULT_MIN_CPU_LOAD 60
 static unsigned int min_cpu_load;
 
 /*
@@ -90,7 +90,7 @@ static unsigned int up_rate_us;
  * The minimum amount of time to spend at a frequency before we can ramp down.
  * Notice we ignore this when we are above the ideal frequency.
  */
-#define DEFAULT_DOWN_RATE_US 120000
+#define DEFAULT_DOWN_RATE_US 100000
 static unsigned int down_rate_us;
 
 #define DEFAULT_SAMPLING_RATE 40000
@@ -105,7 +105,7 @@ static bool touch_poke = true;
 static bool sync_cpu_downscale = false;
 
 static unsigned int boost_freq = 1150000;
-static bool boost = true;
+static bool boost = false;
 
 static unsigned int boost_duration = 0;
 

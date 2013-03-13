@@ -40,6 +40,7 @@
 
 #include "../arch/arm/mach-tegra/tegra_pmqos.h"
 
+
 #undef LOG_TAG
 #define LOG_TAG "AUD"
 
@@ -104,7 +105,7 @@ static int aic3008_tx_mode;
 static int aic3008_dsp_mode;
 static bool first_boot_path = false;
 static bool dspindex_init_done = false;
-struct pm_qos_request_list aud_cpu_minfreq_req;
+static struct pm_qos_request_list aud_cpu_minfreq_req;
 
 struct aic3008_power *aic3008_power_ctl;
 
@@ -444,18 +445,25 @@ void aic3008_votecpuminfreq(bool bflag)
     {
 		tegra_pmqos_audio = 1;
 		update_tegra_pmqos_freqs();
-        pm_qos_update_request(&aud_cpu_minfreq_req, (s32)T3_CPU_MIN_FREQ);
+        set_aud_cpu_minfreq(T3_CPU_MIN_FREQ);
         AUD_INFO("VoteMinFreqS:%d\n", T3_CPU_MIN_FREQ);
     }
     else
     {
 		tegra_pmqos_audio = 0;
 		update_tegra_pmqos_freqs();
-        pm_qos_update_request(&aud_cpu_minfreq_req, (s32)PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
+        set_aud_cpu_minfreq(PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
         AUD_INFO("VoteMinFreqE:%d\n", PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
     }
     return;
 }
+
+void set_aud_cpu_minfreq(unsigned int freq)
+{
+	pm_qos_update_request(&aud_cpu_minfreq_req, (s32)freq);
+}
+
+
 
 void aic3008_CodecInit()
 {

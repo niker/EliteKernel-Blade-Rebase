@@ -25,8 +25,8 @@
 #include "tegra_pmqos.h"
 #include "../sound/soc/codecs/tlv320aic3008.h"
 
-struct pm_qos_request_list ps_cpu_maxfreq_req;
-struct pm_qos_request_list ps_cpu_maxcores_req;
+static struct pm_qos_request_list ps_cpu_maxfreq_req;
+static struct pm_qos_request_list ps_cpu_maxcores_req;
 
 #define htc_perf_attr(attrbute) 				\
 static struct kobj_attribute attrbute##_attr = {	\
@@ -97,84 +97,55 @@ static ssize_t power_save_store(struct kobject *kobj,
 	switch(value) {
 	case 'n':
 	case 'N':
-		if (tegra_pmqos_powersave == 1) {
-			tegra_pmqos_powersave = 0;
-			update_tegra_pmqos_freqs();
-			if(tegra_pmqos_audio == 1)
-			{
-				pm_qos_update_request(&aud_cpu_minfreq_req, (s32)T3_CPU_MIN_FREQ);
-			}
-			else
-			{
-				pm_qos_update_request(&aud_cpu_minfreq_req, (s32)PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
-			}
-			
-			if(tegra_pmqos_powersave == 1)
-			{
-		        pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PS_T3_CPU_MAX_FREQ);
-				pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PS_T3_CPU_MAX_CORES);
-
-			}
-			else
-			{
-				pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PM_QOS_CPU_FREQ_MAX_DEFAULT_VALUE);
-				pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PM_QOS_MAX_ONLINE_CPUS_DEFAULT_VALUE);
-			}
+		tegra_pmqos_powersave = 0;
+		update_tegra_pmqos_freqs();
+		if(tegra_pmqos_audio == 1)
+		{
+			set_aud_cpu_minfreq(T3_CPU_MIN_FREQ);
 		}
+		else
+		{
+			set_aud_cpu_minfreq(PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
+		}
+			
+		pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PM_QOS_CPU_FREQ_MAX_DEFAULT_VALUE);
+		pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PM_QOS_MAX_ONLINE_CPUS_DEFAULT_VALUE);
+			
 		break;
-
 	case 'y':
 	case 'Y':
-		if (tegra_pmqos_powersave == 0) {
-			tegra_pmqos_powersave = 1;
-			update_tegra_pmqos_freqs();
-			if(tegra_pmqos_audio == 1)
-			{
-				pm_qos_update_request(&aud_cpu_minfreq_req, (s32)T3_CPU_MIN_FREQ);
-			}
-			else
-			{
-				pm_qos_update_request(&aud_cpu_minfreq_req, (s32)PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
-			}
-			
-			if(tegra_pmqos_powersave == 1)
-			{
-		        pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PS_T3_CPU_MAX_FREQ);
-				pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PS_T3_CPU_MAX_CORES);
-			}
-			else
-			{
-				pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PM_QOS_CPU_FREQ_MAX_DEFAULT_VALUE);
-				pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PM_QOS_MAX_ONLINE_CPUS_DEFAULT_VALUE);
-			}
-
+		tegra_pmqos_powersave = 1;
+		update_tegra_pmqos_freqs();
+		if(tegra_pmqos_audio == 1)
+		{
+			set_aud_cpu_minfreq(T3_CPU_MIN_FREQ);
 		}
+		else
+		{
+			set_aud_cpu_minfreq(PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
+		}
+			
+		pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PS_T3_CPU_MAX_FREQ);
+		pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PS_T3_CPU_MAX_CORES);
+		
+		
 		break;
 	case 't':
 	case 'T':
-		if(tegra_pmqos_powersave == 0) {
-			tegra_pmqos_powersave = 1;
-			update_tegra_pmqos_freqs();
-			if(tegra_pmqos_audio == 1)
-			{
-				pm_qos_update_request(&aud_cpu_minfreq_req, (s32)T3_CPU_MIN_FREQ);
-			}
-			else
-			{
-				pm_qos_update_request(&aud_cpu_minfreq_req, (s32)PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
-			}
-			
-			if(tegra_pmqos_powersave == 1)
-			{
-		        pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PS_T3_CPU_MAX_FREQ);
-				pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PS_T3_CPU_MAX_CORES);
-			}
-			else
-			{
-				pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PM_QOS_CPU_FREQ_MAX_DEFAULT_VALUE);
-				pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PM_QOS_MAX_ONLINE_CPUS_DEFAULT_VALUE);
-			}
+		tegra_pmqos_powersave = 1;
+		update_tegra_pmqos_freqs();
+		if(tegra_pmqos_audio == 1)
+		{
+			set_aud_cpu_minfreq(T3_CPU_MIN_FREQ);
 		}
+		else
+		{
+			set_aud_cpu_minfreq(PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
+		}
+			
+	    pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PS_T3_CPU_MAX_FREQ);
+		pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PS_T3_CPU_MAX_CORES);
+		
 		break;
 	default:
 		pr_info("[htc_perf] Default, return;");
@@ -240,6 +211,7 @@ static struct attribute_group attr_group = {
 
 static int __init htc_perf_init(void)
 {
+
 	pm_qos_add_request(&ps_cpu_maxfreq_req, PM_QOS_CPU_FREQ_MAX, (s32)PM_QOS_CPU_FREQ_MAX_DEFAULT_VALUE);
 	pm_qos_add_request(&ps_cpu_maxcores_req, PM_QOS_MAX_ONLINE_CPUS, (s32)PM_QOS_MAX_ONLINE_CPUS_DEFAULT_VALUE);
 
