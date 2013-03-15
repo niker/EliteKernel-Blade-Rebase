@@ -141,26 +141,7 @@ static ssize_t power_save_store(struct kobject *kobj,
 		break;
 	case 't':
 	case 'T':
-		/*if(!is_power_save_policy)
-		{
-			is_power_save_policy = 1;
-			tegra_pmqos_powersave = 1;
-			update_tegra_pmqos_freqs();
-			
-			if(tegra_pmqos_audio == 1)
-			{
-				set_aud_cpu_minfreq(T3_CPU_MIN_FREQ);
-			}
-			else
-			{
-				set_aud_cpu_minfreq(PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
-			}
-			
-		    pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PS_T3_CPU_MAX_FREQ);
-			pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PS_T3_CPU_MAX_CORES);
-			
-			//cpufreq_qos_cap_policy();
-		}*/
+
 		break;
 	default:
 		pr_info("[htc_perf] Default, return;");
@@ -211,31 +192,7 @@ EXPORT_SYMBOL(get_cpu_debug);
 
 void restoreCap(int on)
 {
-	/*if (is_power_save_policy)
-	{
-		is_power_save_policy = 0;
-		
-		if(tegra_pmqos_audio == 1)
-		{
-			set_aud_cpu_minfreq(T3_CPU_MIN_FREQ);
-		}
-		else
-		{
-			set_aud_cpu_minfreq(PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
-		}
-		
-		if(tegra_pmqos_powersave == 1)
-		{
-			pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PS_T3_CPU_MAX_FREQ);
-			pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PS_T3_CPU_MAX_CORES);
-		}
-		else
-		{
-			pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PM_QOS_CPU_FREQ_MAX_DEFAULT_VALUE);
-			pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PM_QOS_MAX_ONLINE_CPUS_DEFAULT_VALUE);
-		}	
-		
-	}*/
+
 }
 EXPORT_SYMBOL(restoreCap);
 

@@ -666,6 +666,7 @@ int tegra_update_cpu_speed(unsigned long rate)
              status = mpdecision_gmode_notifier();
              if (status == 0)
              	pr_err("%s: couldn't switch to gmode (freq)", __func__ );
+
 #endif
 			/* restore the target frequency, and
 			 * let the rest of the function handle

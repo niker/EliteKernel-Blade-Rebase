@@ -1987,38 +1987,39 @@ void cpufreq_qos_cap_policy()
 	int cpu;
 	for_each_online_cpu(cpu) 
 	{
-		
-		struct cpufreq_policy *data = cpufreq_cpu_get(cpu);
-		if (!data)
+		if(cpu == 0)
 		{
-			continue;
-		}
-		if (unlikely(lock_policy_rwsem_write(cpu))) {
-	    	cpufreq_cpu_put(data);
-	    	continue;
-	    }
+			struct cpufreq_policy *data = cpufreq_cpu_get(cpu);
+			if (!data)
+			{
+				continue;
+			}
+			if (unlikely(lock_policy_rwsem_write(cpu))) {
+		    	cpufreq_cpu_put(data);
+		    	continue;
+		    }
 		
-		struct cpufreq_real_policy user_policy = data->user_policy;
+			struct cpufreq_real_policy user_policy = data->user_policy;
 		
-		unsigned int qmin, qmax;
-		unsigned int tmin = data->cpuinfo.min_freq;
-		unsigned int tmax = data->cpuinfo.max_freq;
-		unsigned int pmin = user_policy.min;
-		unsigned int pmax = user_policy.max;
+			unsigned int qmin, qmax;
+			unsigned int tmin = data->cpuinfo.min_freq;
+			unsigned int tmax = data->cpuinfo.max_freq;
+			unsigned int pmin = user_policy.min;
+			unsigned int pmax = user_policy.max;
 		
-		qmin = max((unsigned int)pm_qos_request(PM_QOS_CPU_FREQ_MIN), tmin);
-		qmax = min((unsigned int)pm_qos_request(PM_QOS_CPU_FREQ_MAX), tmax);
+			qmin = max((unsigned int)pm_qos_request(PM_QOS_CPU_FREQ_MIN), tmin);
+			qmax = min((unsigned int)pm_qos_request(PM_QOS_CPU_FREQ_MAX), tmax);
 
-		qmin = min(qmin, T3_LP_MAX_FREQ);
-		qmax = min(qmax, pmax);
+			qmin = min(qmin, T3_LP_MAX_FREQ);
+			qmax = min(qmax, pmax);
 		
-		data->min = qmin;
-		data->max = qmax;
+			data->min = qmin;
+			data->max = qmax;
 		
-		data->user_policy = user_policy;
-		unlock_policy_rwsem_write(cpu);
-		cpufreq_cpu_put(data);
-		
+			data->user_policy = user_policy;
+			unlock_policy_rwsem_write(cpu);
+			cpufreq_cpu_put(data);
+		}
 	}
 }
 
