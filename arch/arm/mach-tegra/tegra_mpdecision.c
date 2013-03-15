@@ -569,6 +569,8 @@ static void tegra_mpdec_early_suspend(struct early_suspend *h)
         if ((lp_possible()) && (!is_lp_cluster())) {
                 if(!tegra_lp_cpu_handler(true, false))
                         pr_err(MPDEC_TAG"CPU[LP] error, cannot power up.\n");
+				else
+					cpufreq_qos_cap_policy();
         } else if (!is_lp_cluster()) {
                 queue_delayed_work(tegra_mpdec_suspended_workq, &tegra_mpdec_suspended_work,
                                    TEGRA_MPDEC_LPCPU_UPDELAY);
