@@ -42,6 +42,7 @@
 extern unsigned int T3_CPU_MIN_FREQ;
 extern unsigned int tegra_pmqos_boost_freq;
 extern unsigned int tegra_pmqos_cpu_freq_limits[];
+
 /* EliteKernel Extreme Powersaving*/
 extern unsigned int tegra_pmqos_powersave;
 extern unsigned int tegra_pmqos_audio;

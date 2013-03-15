@@ -48,7 +48,10 @@ echo "51000" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
 echo "51000" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
 echo "51000" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq
 echo "51000" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq
-
+echo "51000" > /sys/devices/system/cpu/cpu0/cpufreq/policy_min_freq
+echo "51000" > /sys/devices/system/cpu/cpu1/cpufreq/policy_min_freq
+echo "51000" > /sys/devices/system/cpu/cpu2/cpufreq/policy_min_freq
+echo "51000" > /sys/devices/system/cpu/cpu3/cpufreq/policy_min_freq
 # reset core activation to default
 sleep 1 
 echo 0 > /sys/power/pnpmgr/hotplug/min_on_cpus

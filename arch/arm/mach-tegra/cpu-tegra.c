@@ -210,6 +210,20 @@ static unsigned int user_cap_speed(unsigned int requested_speed)
 	return requested_speed;
 }
 
+static unsigned int pmqos_cap_speed(unsigned int requested_speed)
+{
+	unsigned int ret = requested_speed;
+	if(pm_qos_request(PM_QOS_CPU_FREQ_MIN) > requested_speed)
+	{
+		ret = pm_qos_request(PM_QOS_CPU_FREQ_MIN);
+	}
+	if(pm_qos_request(PM_QOS_CPU_FREQ_MAX) < requested_speed)
+	{
+		ret =  pm_qos_request(PM_QOS_CPU_FREQ_MAX);
+	}
+	return ret;
+}
+
 static int ril_boost = 0;
 
 static int ril_boost_set(const char *arg, const struct kernel_param *kp)
@@ -816,6 +830,7 @@ EXPORT_SYMBOL (mips_aggressive_factor);
 static unsigned int get_scaled_freq (unsigned int target_freq)
 {
     /* chip-dependent, such as thermal throttle, edp, and user-defined freq. cap */
+	target_freq = pmqos_cap_speed (target_freq);
     target_freq = tegra_throttle_governor_speed (target_freq);
 	target_freq = edp_governor_speed (target_freq);
 	target_freq = user_cap_speed (target_freq);

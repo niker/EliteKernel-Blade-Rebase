@@ -19,6 +19,7 @@
 #include <linux/pm_qos_params.h>
 #include <linux/workqueue.h>
 #include <linux/nct1008.h> /* for thermal temperature */
+#include "htc_perf.h"
 #include "cpu-tegra.h"
 #include "fuse.h"
 
@@ -39,6 +40,8 @@ static struct kobj_attribute attrbute##_attr = {	\
 }
 
 #define FUSE_CPUIDDQ 0x118
+static int is_power_save_policy = 0;
+
 
 struct kobject *htc_perf_kobj;
 
@@ -84,6 +87,8 @@ static ssize_t power_save_show(struct kobject *kobj,
 
 	if(tegra_pmqos_powersave == 1)
 		value = 'Y';
+	if(is_power_save_policy)
+		value = 'T';
 
 	return sprintf(buf, "%c\n", value);
 }
@@ -110,12 +115,15 @@ static ssize_t power_save_store(struct kobject *kobj,
 			
 		pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PM_QOS_CPU_FREQ_MAX_DEFAULT_VALUE);
 		pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PM_QOS_MAX_ONLINE_CPUS_DEFAULT_VALUE);
-			
+		
+		cpufreq_qos_cap_policy();
+		
 		break;
 	case 'y':
 	case 'Y':
 		tegra_pmqos_powersave = 1;
 		update_tegra_pmqos_freqs();
+		
 		if(tegra_pmqos_audio == 1)
 		{
 			set_aud_cpu_minfreq(T3_CPU_MIN_FREQ);
@@ -128,24 +136,31 @@ static ssize_t power_save_store(struct kobject *kobj,
 		pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PS_T3_CPU_MAX_FREQ);
 		pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PS_T3_CPU_MAX_CORES);
 		
+		cpufreq_qos_cap_policy();
 		
 		break;
 	case 't':
 	case 'T':
-		tegra_pmqos_powersave = 1;
-		update_tegra_pmqos_freqs();
-		if(tegra_pmqos_audio == 1)
+		/*if(!is_power_save_policy)
 		{
-			set_aud_cpu_minfreq(T3_CPU_MIN_FREQ);
-		}
-		else
-		{
-			set_aud_cpu_minfreq(PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
-		}
+			is_power_save_policy = 1;
+			tegra_pmqos_powersave = 1;
+			update_tegra_pmqos_freqs();
 			
-	    pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PS_T3_CPU_MAX_FREQ);
-		pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PS_T3_CPU_MAX_CORES);
-		
+			if(tegra_pmqos_audio == 1)
+			{
+				set_aud_cpu_minfreq(T3_CPU_MIN_FREQ);
+			}
+			else
+			{
+				set_aud_cpu_minfreq(PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
+			}
+			
+		    pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PS_T3_CPU_MAX_FREQ);
+			pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PS_T3_CPU_MAX_CORES);
+			
+			//cpufreq_qos_cap_policy();
+		}*/
 		break;
 	default:
 		pr_info("[htc_perf] Default, return;");
@@ -156,6 +171,17 @@ static ssize_t power_save_store(struct kobject *kobj,
 }
 
 htc_perf_attr(power_save);
+
+/* For JNI power save policy */
+static struct kobj_attribute power_save_policy_attr = {
+	.attr	= {
+		.name = __stringify(power_save_policy),
+		.mode = 0644,
+	},
+	.show	= power_save_show,
+	.store	= power_save_store,
+};
+
 static unsigned int cpu_debug_on = 0;
 
 static ssize_t cpu_debug_show(struct kobject *kobj,
@@ -185,7 +211,31 @@ EXPORT_SYMBOL(get_cpu_debug);
 
 void restoreCap(int on)
 {
-
+	/*if (is_power_save_policy)
+	{
+		is_power_save_policy = 0;
+		
+		if(tegra_pmqos_audio == 1)
+		{
+			set_aud_cpu_minfreq(T3_CPU_MIN_FREQ);
+		}
+		else
+		{
+			set_aud_cpu_minfreq(PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
+		}
+		
+		if(tegra_pmqos_powersave == 1)
+		{
+			pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PS_T3_CPU_MAX_FREQ);
+			pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PS_T3_CPU_MAX_CORES);
+		}
+		else
+		{
+			pm_qos_update_request(&ps_cpu_maxfreq_req, (s32)PM_QOS_CPU_FREQ_MAX_DEFAULT_VALUE);
+			pm_qos_update_request(&ps_cpu_maxcores_req, (s32)PM_QOS_MAX_ONLINE_CPUS_DEFAULT_VALUE);
+		}	
+		
+	}*/
 }
 EXPORT_SYMBOL(restoreCap);
 
@@ -201,7 +251,8 @@ static struct attribute * g[] = {
 	&cpu_temp_attr.attr,
 	&power_save_attr.attr,
 	&cpu_debug_attr.attr,
-	&cpuiddq_attr.attr,
+	&power_save_policy_attr.attr,
+        &cpuiddq_attr.attr,
 	NULL,
 };
 

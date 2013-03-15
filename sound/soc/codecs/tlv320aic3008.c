@@ -38,6 +38,7 @@
 #include <linux/spi-tegra.h>
 #include <linux/pm_qos_params.h>
 
+#include <linux/cpufreq.h>
 #include "../arch/arm/mach-tegra/tegra_pmqos.h"
 
 
@@ -461,6 +462,7 @@ void aic3008_votecpuminfreq(bool bflag)
 void set_aud_cpu_minfreq(unsigned int freq)
 {
 	pm_qos_update_request(&aud_cpu_minfreq_req, (s32)freq);
+	cpufreq_qos_cap_policy();
 }
 
 
