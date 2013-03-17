@@ -373,6 +373,11 @@ CONFIG_RIL_FTRACE_DEBUG_SOCK_IOCTL=y
 CONFIG_TEGRA_GPU_OC is not set
 CONFIG_TEGRA3_VARIANT_CPU_OVERCLOCK is not set
 CONFIG_VOLTAGE_CONTROL=y
+<<<<<<< HEAD
+=======
+CONFIG_SMARTDIMMER=y
+CONFIG_TEGRA_UNIFY_VARIANT is not set
+>>>>>>> 964f4ba... tegra: added kernel config for unify variant
 
 #
 # Processor Type
