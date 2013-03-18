@@ -70,42 +70,42 @@ static unsigned int ramp_down_step;
 /*
  * CPU freq will be increased if measured load > max_cpu_load;
  */
-#define DEFAULT_MAX_CPU_LOAD 94
+#define DEFAULT_MAX_CPU_LOAD 90
 static unsigned int max_cpu_load;
 
 /*
  * CPU freq will be decreased if measured load < min_cpu_load;
  */
-#define DEFAULT_MIN_CPU_LOAD 60
+#define DEFAULT_MIN_CPU_LOAD 50
 static unsigned int min_cpu_load;
 
 /*
  * The minimum amount of time to spend at a frequency before we can ramp up.
  * Notice we ignore this when we are below the ideal frequency.
  */
-#define DEFAULT_UP_RATE_US 80000
+#define DEFAULT_UP_RATE_US 60000
 static unsigned int up_rate_us;
 
 /*
  * The minimum amount of time to spend at a frequency before we can ramp down.
  * Notice we ignore this when we are above the ideal frequency.
  */
-#define DEFAULT_DOWN_RATE_US 100000
+#define DEFAULT_DOWN_RATE_US 90000
 static unsigned int down_rate_us;
 
-#define DEFAULT_SAMPLING_RATE 40000
+#define DEFAULT_SAMPLING_RATE 30000
 static unsigned int sampling_rate;
 
 #define DEFAULT_INPUT_BOOST_DURATION 10000000
 static unsigned int input_boost_duration;
 
-static unsigned int touch_poke_freq = 760000;
+static unsigned int touch_poke_freq = 1150000;
 static bool touch_poke = true;
 
 static bool sync_cpu_downscale = false;
 
 static unsigned int boost_freq = 1150000;
-static bool boost = false;
+static bool boost = true;
 
 static unsigned int boost_duration = 0;
 

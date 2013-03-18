@@ -70,4 +70,8 @@ echo "1536,3072,6144,11264,16384,20480" > /sys/module/lowmemorykiller/parameters
 
 touch /data/local/em_delayed_tweaks
 
+# start user init
+# activate delayed config to override Kernel
+/system/xbin/busybox nohup /system/bin/sh /data/local/userinit.sh 2>&1 >/dev/null &
+
 
