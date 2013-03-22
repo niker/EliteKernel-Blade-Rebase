@@ -444,6 +444,7 @@ void aic3008_votecpuminfreq(bool bflag)
     boldCPUMinReq = bflag;
     if (bflag)
     {
+<<<<<<< HEAD
 		tegra_pmqos_audio = 1;
 		update_tegra_pmqos_freqs();
         set_aud_cpu_minfreq(T3_CPU_MIN_FREQ);
@@ -455,6 +456,15 @@ void aic3008_votecpuminfreq(bool bflag)
 		update_tegra_pmqos_freqs();
         set_aud_cpu_minfreq(PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
         AUD_INFO("VoteMinFreqE:%d\n", PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
+=======
+        pm_qos_update_request(&aud_cpu_minfreq_req, (s32)audio_min_freq);
+        AUD_DBG("VoteMinFreqS:%d\n", audio_min_freq);
+    }
+    else
+    {
+        pm_qos_update_request(&aud_cpu_minfreq_req, (s32)PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
+        AUD_DBG("VoteMinFreqE:%d\n", PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
+>>>>>>> 0401047... audio: make less chatty by default
     }
     return;
 }
@@ -751,7 +761,7 @@ static void aic3008_tx_config(int mode)
 	}
 
 	/* route tx device */
-	AUD_INFO("[TX] ----- change i/o uplink TX %d len(%d) -----\n", mode,
+	AUD_DBG("[TX] ----- change i/o uplink TX %d len(%d) -----\n", mode,
 			(aic3008_uplink[mode][0].data-1));
 
 	aic3008_config(&aic3008_uplink[mode][1], aic3008_uplink[mode][0].data);
@@ -778,7 +788,7 @@ static void aic3008_rx_config(int mode)
 	}
 
 	/* route rx device */
-	AUD_INFO("[RX] ----- change i/o downlink RX %d len(%d) -----\n", mode,
+	AUD_DBG("[RX] ----- change i/o downlink RX %d len(%d) -----\n", mode,
 			(aic3008_downlink[mode][0].data-1));
 
 	aic3008_config(&aic3008_downlink[mode][1], aic3008_downlink[mode][0].data);
@@ -810,7 +820,7 @@ static void aic3008_powerdown(void)
 	aic3008_power_ctl->suspend();
 
 	t2 = ktime_to_ms(ktime_get()) - t1;
-	AUD_INFO("[PWR] power down AIC3008 %lldms\n", t2);
+	AUD_DBG("[PWR] power down AIC3008 %lldms\n", t2);
 
 	return;
 }
@@ -824,7 +834,7 @@ static void aic3008_powerup(void)
 	aic3008_power_ctl->resume();
 
 	t2 = ktime_to_ms(ktime_get()) - t1;
-	AUD_INFO("[PWR] power on AIC3008 %lldms\n", t2);
+	AUD_DBG("[PWR] power on AIC3008 %lldms\n", t2);
 
 	return;
 }
@@ -895,6 +905,7 @@ static void aic3008_set_loopback(int mode)
 	}
 }
 
+#ifdef DEBUG
 static void dump_dspindex(void)
 {
     int i = 0;
@@ -903,6 +914,7 @@ static void dump_dspindex(void)
         AUD_DBG("aic3008_dspindex[%d] = %d\n", i, aic3008_dspindex[i]);
     }
 }
+#endif
 
 /* this is the default dspindex for the HOX+
 this is dependent on /system/etc/soundimages!!!! 
@@ -964,7 +976,7 @@ static int aic3008_set_config(int config_tbl, int idx, int en)
 		return -EFAULT;
 	}
 
-	AUD_INFO("%s: %d %d %d", __func__, config_tbl, idx, en);
+	AUD_DBG("%s: %d %d %d", __func__, config_tbl, idx, en);
 
 	mutex_lock(&lock);
 /*	spi_aic3008_prevent_sleep(); */
@@ -983,18 +995,18 @@ static int aic3008_set_config(int config_tbl, int idx, int en)
 		}
 
 		if (en) {
-			AUD_INFO("[TX] AIC3008_IO_CONFIG_TX: UPLINK idx = %d\n",idx);
+			AUD_DBG("[TX] AIC3008_IO_CONFIG_TX: UPLINK idx = %d\n",idx);
 			aic3008_tx_config(idx);
 			aic3008_tx_mode = idx;
 		} else {
-			AUD_INFO("[TX] AIC3008_IO_CONFIG_TX: UPLINK_PATH_OFF\n");
+			AUD_DBG("[TX] AIC3008_IO_CONFIG_TX: UPLINK_PATH_OFF\n");
 			aic3008_tx_config(UPLINK_PATH_OFF);
 			aic3008_tx_mode = UPLINK_PATH_OFF;
 		}
 
 		if ((aic3008_tx_mode == UPLINK_PATH_OFF) && (aic3008_rx_mode == DOWNLINK_PATH_OFF))
 		{
-			AUD_INFO("[TX] AIC3008_IO_CONFIG_TX: PATH OFF Call aic3008_powerdown()\n");
+			AUD_DBG("[TX] AIC3008_IO_CONFIG_TX: PATH OFF Call aic3008_powerdown()\n");
 			aic3008_powerdown();
 		}
 		break;
@@ -1013,38 +1025,38 @@ static int aic3008_set_config(int config_tbl, int idx, int en)
 		aic3008_AmpSwitch(aic3008_rx_mode, 0);
 		if(!first_boot_path && idx == 10)
 		{
-			AUD_INFO("[RX] AIC3008_IO_CONFIG_RX: first_boot_path = 10\n");
+			AUD_DBG("[RX] AIC3008_IO_CONFIG_RX: first_boot_path = 10\n");
 			idx = DOWNLINK_PATH_OFF;
 			aic3008_rx_mode = DOWNLINK_PATH_OFF;
 			first_boot_path = true;
 		}
 		if (en) {
-			AUD_INFO("[RX] AIC3008_IO_CONFIG_RX: DOWNLINK idx = %d\n",idx);
+			AUD_DBG("[RX] AIC3008_IO_CONFIG_RX: DOWNLINK idx = %d\n",idx);
 			aic3008_rx_config(idx);
 			aic3008_rx_mode = idx;
 			if(aic3008_power_ctl->hs_vol_control)
 			{
 				if(idx == PLAYBACK_HEADPHONE_URBEATS)
 				{
-					AUD_INFO("[RX] BEATS_GAIN_ON\n");
+					AUD_DBG("[RX] BEATS_GAIN_ON\n");
 					aic3008_power_ctl->headset_vol_control(BEATS_GAIN_ON);
 				}
 				else
 				{
-					AUD_INFO("[RX] BEATS_GAIN_OFF\n");
+					AUD_DBG("[RX] BEATS_GAIN_OFF\n");
 					aic3008_power_ctl->headset_vol_control(BEATS_GAIN_OFF);
 				}
 			}
 			aic3008_AmpSwitch(idx, 1);
 		} else {
-			AUD_INFO("[RX] AIC3008_IO_CONFIG_RX: DOWNLINK_PATH_OFF\n");
+			AUD_DBG("[RX] AIC3008_IO_CONFIG_RX: DOWNLINK_PATH_OFF\n");
 			aic3008_rx_config(DOWNLINK_PATH_OFF);
 			aic3008_rx_mode = DOWNLINK_PATH_OFF;
 		}
 
 		if ((aic3008_tx_mode == UPLINK_PATH_OFF) && (aic3008_rx_mode == DOWNLINK_PATH_OFF))
 		{
-			AUD_INFO("[RX] AIC3008_IO_CONFIG_RX: PATH OFF Call aic3008_powerdown()\n");
+			AUD_DBG("[RX] AIC3008_IO_CONFIG_RX: PATH OFF Call aic3008_powerdown()\n");
 			aic3008_powerdown();
 		}
 		break;
@@ -1115,7 +1127,7 @@ static int aic3008_set_config(int config_tbl, int idx, int en)
 		}
 		else if(idx == 53)
 		{
-			AUD_INFO("[DSP] idx = %d, BEATS_ON!!\n", idx);
+			AUD_DBG("[DSP] idx = %d, BEATS_ON!!\n", idx);
 			if(aic3008_power_ctl->hs_vol_control)
 			{
 				aic3008_power_ctl->headset_vol_control(BEATS_GAIN_ON);
@@ -1125,7 +1137,7 @@ static int aic3008_set_config(int config_tbl, int idx, int en)
 		}
 		else if(idx == 54)
 		{
-			AUD_INFO("[DSP] idx = %d, BEATS_OFF!!\n", idx);
+			AUD_DBG("[DSP] idx = %d, BEATS_OFF!!\n", idx);
 			if(aic3008_power_ctl->hs_vol_control)
 			{
 				aic3008_power_ctl->headset_vol_control(BEATS_GAIN_OFF);
@@ -1135,31 +1147,31 @@ static int aic3008_set_config(int config_tbl, int idx, int en)
 		}
 		else if(idx == 55)
 		{
-			AUD_INFO("[DSP] idx = %d, disable SPK_AMP!!\n", idx);
+			AUD_DBG("[DSP] idx = %d, disable SPK_AMP!!\n", idx);
 			aic3008_AmpSwitch(PLAYBACK_SPEAKER, 0);
 			break;
 		}
 		else if(idx == 56)
 		{
-			AUD_INFO("[DSP] idx = %d, enable SPK_AMP!!\n", idx);
+			AUD_DBG("[DSP] idx = %d, enable SPK_AMP!!\n", idx);
 			aic3008_AmpSwitch(PLAYBACK_SPEAKER, 1);
 			break;
 		}
 		else if(idx == 57)
 		{
-			AUD_INFO("[DSP] idx = %d, disable HS_Output!!\n", idx);
+			AUD_DBG("[DSP] idx = %d, disable HS_Output!!\n", idx);
 			aic3008_config(HS_MUTE, ARRAY_SIZE(HS_MUTE));
 			break;
 		}
 		else if(idx == 58)
 		{//Might have noise when unmute, use this carefully.
-			AUD_INFO("[DSP] idx = %d, enable HS_Output!!\n", idx);
+			AUD_DBG("[DSP] idx = %d, enable HS_Output!!\n", idx);
 			aic3008_config(HS_UNMUTE, ARRAY_SIZE(HS_UNMUTE));
 			break;
 		}
 		else if(idx == 59)
 		{
-			AUD_INFO("[DSP] idx = %d, enable Beats icon!!\n", idx);
+			AUD_DBG("[DSP] idx = %d, enable Beats icon!!\n", idx);
 			new_state = 1;
 			old_state = switch_get_state(&sdev_beats);
 			if (new_state != old_state)
@@ -1168,7 +1180,7 @@ static int aic3008_set_config(int config_tbl, int idx, int en)
 		}
 		else if(idx == 60)
 		{
-			AUD_INFO("[DSP] idx = %d, disable Beats icon!!\n", idx);
+			AUD_DBG("[DSP] idx = %d, disable Beats icon!!\n", idx);
 			new_state = 0;
 			old_state = switch_get_state(&sdev_beats);
 			if (new_state != old_state)
@@ -1194,14 +1206,13 @@ static int aic3008_set_config(int config_tbl, int idx, int en)
 			// maxwen
 			if (!dspindex_init_done){
             	init_default_dspindex();
-				dump_dspindex();
 			}
-#if 0
+#ifdef DEBUG
 			dump_dspindex();
 #endif
 
 			if (aic3008_dspindex[idx] != -1) {
-				AUD_ERR("[DSP] AIC3008_IO_CONFIG_MEDIA: dsp index %d %d\n", idx, aic3008_dspindex[idx]);
+				AUD_DBG("[DSP] AIC3008_IO_CONFIG_MEDIA: dsp index %d %d\n", idx, aic3008_dspindex[idx]);
 				aic3008_power_ctl->i2s_control(aic3008_dspindex[idx]);
 			} else {
 			    AUD_ERR("[DSP] AIC3008_IO_CONFIG_MEDIA: unknown dsp index %d\n", idx);
@@ -1222,7 +1233,7 @@ static int aic3008_set_config(int config_tbl, int idx, int en)
 		/* we use this value to dump dsp. */
 		aic3008_dsp_mode = idx;
 
-		AUD_INFO("[DSP] AIC3008_IO_CONFIG_MEDIA: Original RX %d, TX %d. start DSP = %d ++.\n",
+		AUD_DBG("[DSP] AIC3008_IO_CONFIG_MEDIA: Original RX %d, TX %d. start DSP = %d ++.\n",
 				aic3008_rx_mode, aic3008_tx_mode, idx);
 
 		len = (((int)(aic3008_minidsp[idx][0].reg) & 0xFF) << 8) | ((int)(aic3008_minidsp[idx][0].data) & 0xFF);
@@ -1246,10 +1257,10 @@ static int aic3008_set_config(int config_tbl, int idx, int en)
 
 		t2 = ktime_to_ms(ktime_get()) - t1;
 
-		AUD_INFO("[DSP] AIC3008_IO_CONFIG_MEDIA: configure miniDSP index(%d) len = %d, time: %lldms --\n", idx, len, (t2));
+		AUD_DBG("[DSP] AIC3008_IO_CONFIG_MEDIA: configure miniDSP index(%d) len = %d, time: %lldms --\n", idx, len, (t2));
 		break;
 	default:
-		AUD_ERR("aic3008_set_config case error\n");
+		AUD_ERR("[DSP] aic3008_set_config case error\n");
 		break;
 	}
 
@@ -1351,11 +1362,11 @@ static long aic3008_ioctl(struct file *file, unsigned int cmd,
 	switch (cmd) {
 	/* first IO command from HAL */
 	case AIC3008_IO_SET_TX_PARAM:
-	    AUD_INFO("AIC3008_IO_SET_TX_PARAM\n");
+	    AUD_DBG("AIC3008_IO_SET_TX_PARAM\n");
 	/* second IO command from HAL */
 	case AIC3008_IO_SET_RX_PARAM:
         if (cmd != AIC3008_IO_SET_TX_PARAM)
-	        AUD_INFO("AIC3008_IO_SET_RX_PARAM\n");
+	        AUD_DBG("AIC3008_IO_SET_RX_PARAM\n");
 
 		if (copy_from_user(&para, (void *) argc, sizeof(para))) {
 			AUD_ERR("failed on copy_from_user\n");
@@ -1363,7 +1374,7 @@ static long aic3008_ioctl(struct file *file, unsigned int cmd,
 			break;
 		}
 
-		AUD_INFO("parameters(%d, %d, %p)\n",
+		AUD_DBG("parameters(%d, %d, %p)\n",
 				para.row_num, para.col_num, para.cmd_data);
 
 		if (cmd == AIC3008_IO_SET_TX_PARAM) {
@@ -1391,14 +1402,14 @@ static long aic3008_ioctl(struct file *file, unsigned int cmd,
 		if (cmd == AIC3008_IO_SET_TX_PARAM)
 			aic3008_tx_config(INITIAL);
 
-		AUD_INFO("update RX/TX tables(%d, %d) successfully\n",
+		AUD_DBG("update RX/TX tables(%d, %d) successfully\n",
 				para.row_num, para.col_num);
 		break;
 
 	/* third io command from HAL */
     case AIC3008_IO_SET_DSP_PARAM_ICS:
 	case AIC3008_IO_SET_DSP_PARAM:
-	    AUD_INFO("AIC3008_IO_SET_DSP_PARAM\n");
+	    AUD_DBG("AIC3008_IO_SET_DSP_PARAM\n");
 		if (copy_from_user(&para, (void *) argc, sizeof(para))) {
 			AUD_ERR("failed on copy_from_user\n");
 			ret = -EFAULT;
@@ -1426,7 +1437,7 @@ static long aic3008_ioctl(struct file *file, unsigned int cmd,
 			break;
 		}
 
-		AUD_INFO("update dsp table(%d, %d) successfully\n",
+		AUD_DBG("update dsp table(%d, %d) successfully\n",
 				para.row_num, para.col_num);
 
 		break;
@@ -1434,7 +1445,7 @@ static long aic3008_ioctl(struct file *file, unsigned int cmd,
 	/* fourth io command from HAL */
 	/* this is NOT called from the ICS audio drivers on HOX+ */
 	case AIC3008_IO_SET_DSP_INDEX:
-	    AUD_INFO("AIC3008_IO_SET_DSP_INDEX\n");
+	    AUD_DBG("AIC3008_IO_SET_DSP_INDEX\n");
 		if (copy_from_user(&para, (void *) argc, sizeof(para))) {
 			AUD_ERR("failed on copy_from_user\n");
 			ret = -EFAULT;
@@ -1463,19 +1474,19 @@ static long aic3008_ioctl(struct file *file, unsigned int cmd,
 		}
 
 		dspindex_init_done = true;
-		AUD_INFO("update dsp index table(%d, %d) successfully\n",
+		AUD_DBG("update dsp index table(%d, %d) successfully\n",
 				para.row_num, para.col_num);
 		break;
 
 	/* these IO commands are called to set path */
 	case AIC3008_IO_CONFIG_TX:
-	    AUD_INFO("AIC3008_IO_CONFIG_TX\n");
+	    AUD_DBG("AIC3008_IO_CONFIG_TX\n");
 	case AIC3008_IO_CONFIG_RX:
         if (cmd != AIC3008_IO_CONFIG_TX)
-	        AUD_INFO("AIC3008_IO_CONFIG_RX\n");
+	        AUD_DBG("AIC3008_IO_CONFIG_RX\n");
 	case AIC3008_IO_CONFIG_MEDIA:
         if (cmd != AIC3008_IO_CONFIG_TX && cmd !=AIC3008_IO_CONFIG_RX)
-	        AUD_INFO("AIC3008_IO_CONFIG_MEDIA\n");
+	        AUD_DBG("AIC3008_IO_CONFIG_MEDIA\n");
 
 		if (copy_from_user(&i, (void *) argc, sizeof(int))) {
 			AUD_ERR("failed on copy_from_user\n");
@@ -1500,7 +1511,7 @@ static long aic3008_ioctl(struct file *file, unsigned int cmd,
 			break;
 		}
 
-		AUD_INFO("AIC3008 config left volume is not support now.\n");
+		AUD_DBG("AIC3008 config left volume is not support now.\n");
 
 		CODEC_SET_VOLUME_L[1].data = volume;
 
@@ -1521,7 +1532,7 @@ static long aic3008_ioctl(struct file *file, unsigned int cmd,
 			break;
 		}
 
-		AUD_INFO("AIC3008 config right volume is not support now.\n");
+		AUD_DBG("AIC3008 config right volume is not support now.\n");
 
 		CODEC_SET_VOLUME_R[1].data = volume;
 
@@ -1618,14 +1629,14 @@ static long aic3008_ioctl(struct file *file, unsigned int cmd,
 			ret = -EFAULT;
 			break;
 		}
-		AUD_INFO("index %d for LOOPBACK\n", i);
+		AUD_DBG("index %d for LOOPBACK\n", i);
 
 		/* set up the loopback with specific id */
 		aic3008_set_loopback(i);
 		break;
 
 	case AIC3008_IO_GET_PCBID: /* get pcbid */
-		AUD_INFO("pass pcbid %d\n", pcbid);
+		AUD_DBG("pass pcbid %d\n", pcbid);
 		pcbid = htc_get_pcbid_info();
 		if (copy_to_user((void *) argc, &pcbid, sizeof(int))) {
 			AUD_ERR("failed on copy_to_user\n");
