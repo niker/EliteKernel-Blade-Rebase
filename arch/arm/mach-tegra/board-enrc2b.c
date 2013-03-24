@@ -226,8 +226,13 @@ static struct led_i2c_config lp5521_led_config[] = {
 	},
 	{
 		.name = "button-backlight",
+<<<<<<< HEAD
 		.led_cur = 5,
 		.led_lux = 55,
+=======
+		.led_cur = 2,
+		.led_lux = 50,
+>>>>>>> 17dcebf... led: set default button backlight brightness to 50
 	},
 };
 static struct led_i2c_platform_data led_data = {
