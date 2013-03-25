@@ -227,7 +227,11 @@ static struct led_i2c_config lp5521_led_config[] = {
 	{
 		.name = "button-backlight",
 		.led_cur = 2,
+<<<<<<< HEAD
 		.led_lux = 45,
+=======
+		.led_lux = 25,
+>>>>>>> 2d29e52... led: remove HTC derp
 	},
 };
 static struct led_i2c_platform_data led_data = {
@@ -244,8 +248,6 @@ static struct i2c_board_info i2c_led_devices[] = {
 };
 static void leds_lp5521_init(void)
 {
-	if( htc_get_pcbid_info() > PROJECT_PHASE_XC || (board_get_sku_tag() == 0x34600) )
-		lp5521_led_config[2].led_lux = 25;
 	i2c_register_board_info(1, i2c_led_devices,
 		ARRAY_SIZE(i2c_led_devices));
 }
