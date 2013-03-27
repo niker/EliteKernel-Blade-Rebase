@@ -1,6 +1,7 @@
 #!/system/bin/sh
 
-sleep 60 # do the configuration again to override ROM and tegra hardcoded stuff
+sleep 60 
+# do the configuration again to override ROM and tegra hardcoded stuff
 
 # need to enable all CPU cores in order to set them up
 echo 4 > /sys/power/pnpmgr/hotplug/min_on_cpus
@@ -51,7 +52,7 @@ echo "20" > /sys/devices/system/cpu/cpufreq/ondemand/ux_loading
 # set vm tweaks again
 sysctl -w vm.min_free_kbytes=5242
 sysctl -w vm.vfs_cache_pressure=30
-sysctl -w vm.swappiness=40
+sysctl -w vm.swappiness=80
 sysctl -w vm.page-cluster=0
 sysctl -w vm.dirty_expire_centisecs=2400
 sysctl -w vm.dirty_writeback_centisecs=600

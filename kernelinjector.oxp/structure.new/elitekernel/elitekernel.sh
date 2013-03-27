@@ -25,9 +25,6 @@ mount -o remount,ro /system
 echo "sio" > /sys/block/mmcblk0/queue/scheduler
 echo "sio" > /sys/block/mmcblk1/queue/scheduler
 
-# activate delayed config to override ROM
-/system/xbin/busybox nohup /system/bin/sh /elitekernel/elitekernel_delayed.sh 2>&1 >/dev/null &
-
 # need to enable all CPU cores in order to set them up
 echo 4 > /sys/power/pnpmgr/hotplug/min_on_cpus
 sleep 3
@@ -76,7 +73,7 @@ echo "20" > /sys/devices/system/cpu/cpufreq/ondemand/ux_loading
 # set vm tweaks
 sysctl -w vm.min_free_kbytes=5242
 sysctl -w vm.vfs_cache_pressure=30
-sysctl -w vm.swappiness=40
+sysctl -w vm.swappiness=80
 sysctl -w vm.page-cluster=0
 sysctl -w vm.dirty_expire_centisecs=2400
 sysctl -w vm.dirty_writeback_centisecs=600
@@ -88,6 +85,21 @@ sysctl -w vm.overcommit_memory=0
 sysctl -w vm.overcommit_ratio=20
 sysctl -w kernel.panic_on_oops=1
 sysctl -w kernel.panic=10
+
+# enable zramswap first
+insmod /system/lib/modules/zram.ko num_devices=3
+# set ramdisk size to 100MB x 3 (use at most one drive per CPU core)
+echo 104857600 > /sys/block/zram0/disksize
+echo 104857600 > /sys/block/zram1/disksize
+echo 104857600 > /sys/block/zram2/disksize
+#make and setup swap
+mkswap /dev/block/zram0
+mkswap /dev/block/zram1
+mkswap /dev/block/zram2
+swapon -p 15 /dev/block/zram0
+swapon -p 15 /dev/block/zram1
+swapon -p 15 /dev/block/zram2
+
 
 # minfree
 echo "0,1,2,5,7,15" > /sys/module/lowmemorykiller/parameters/adj
@@ -105,4 +117,6 @@ echo "2048" > /sys/block/mmcblk0/queue/read_ahead_kb;
 # feed urandom data to /dev/random to avoid system blocking (potential security risk, use at own peril!)
 /elitekernel/rngd --rng-device=/dev/urandom --random-device=/dev/random --background --feed-interval=60
 
+# activate delayed config to override ROM
+/system/xbin/busybox nohup /system/bin/sh /elitekernel/elitekernel_delayed.sh 2>&1 >/dev/null &
 
