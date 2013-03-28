@@ -52,7 +52,7 @@ echo "20" > /sys/devices/system/cpu/cpufreq/ondemand/ux_loading
 # set vm tweaks again
 sysctl -w vm.min_free_kbytes=5242
 sysctl -w vm.vfs_cache_pressure=30
-sysctl -w vm.swappiness=80
+sysctl -w vm.swappiness=75
 sysctl -w vm.page-cluster=0
 sysctl -w vm.dirty_expire_centisecs=2400
 sysctl -w vm.dirty_writeback_centisecs=600
@@ -60,7 +60,7 @@ sysctl -w vm.dirty_ratio=20
 sysctl -w vm.dirty_background_ratio=30
 sysctl -w vm.oom_kill_allocating_task=0
 sysctl -w vm.panic_on_oom=0
-sysctl -w vm.overcommit_memory=0
+sysctl -w vm.overcommit_memory=1
 sysctl -w vm.overcommit_ratio=20
 sysctl -w kernel.panic_on_oops=1
 sysctl -w kernel.panic=10

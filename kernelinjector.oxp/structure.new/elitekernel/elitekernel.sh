@@ -73,7 +73,7 @@ echo "20" > /sys/devices/system/cpu/cpufreq/ondemand/ux_loading
 # set vm tweaks
 sysctl -w vm.min_free_kbytes=5242
 sysctl -w vm.vfs_cache_pressure=30
-sysctl -w vm.swappiness=80
+sysctl -w vm.swappiness=75
 sysctl -w vm.page-cluster=0
 sysctl -w vm.dirty_expire_centisecs=2400
 sysctl -w vm.dirty_writeback_centisecs=600
@@ -81,17 +81,17 @@ sysctl -w vm.dirty_ratio=20
 sysctl -w vm.dirty_background_ratio=30
 sysctl -w vm.oom_kill_allocating_task=0
 sysctl -w vm.panic_on_oom=0
-sysctl -w vm.overcommit_memory=0
+sysctl -w vm.overcommit_memory=1
 sysctl -w vm.overcommit_ratio=20
 sysctl -w kernel.panic_on_oops=1
 sysctl -w kernel.panic=10
 
 # enable zramswap first
 insmod /system/lib/modules/zram.ko num_devices=3
-# set ramdisk size to 100MB x 3 (use at most one drive per CPU core)
-echo 104857600 > /sys/block/zram0/disksize
-echo 104857600 > /sys/block/zram1/disksize
-echo 104857600 > /sys/block/zram2/disksize
+# set ramdisk size to 64MB x 3 (use at most one drive per CPU core)
+echo 67108864 > /sys/block/zram0/disksize
+echo 67108864 > /sys/block/zram1/disksize
+echo 67108864 > /sys/block/zram2/disksize
 #make and setup swap
 mkswap /dev/block/zram0
 mkswap /dev/block/zram1
