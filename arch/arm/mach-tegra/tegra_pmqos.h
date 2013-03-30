@@ -30,21 +30,11 @@
 #define BOOST_CPU_FREQ_MIN	1400000
 
 
-<<<<<<< HEAD
 #define DEF_T3_CPU_MIN_FREQ     51000
 #define AUD_T3_CPU_MIN_FREQ     102000
 #define PS_AUD_T3_CPU_MIN_FREQ     51000
 #define T3_LP_MAX_FREQ     	475000
-=======
-// tegra_hsuart.c - not automatic must be enabled via sysfs
-// we dont need that on enrc2b
-#define TI_A2DP_CPU_FREQ_MIN 102000
 
-// tegra_hsuart_brcm.c - not automatic must be enabled via sysfs
-// sysfs to change available
-#define A2DP_CPU_FREQ_MIN 204000
-#define OPP_CPU_FREQ_MIN 475000
->>>>>>> 9721dfd... a2dp: added sysfs for a2dp min freq
 
 #define PS_T3_CPU_MAX_FREQ     1150000
 #define PS_T3_CPU_MAX_CORES    3
