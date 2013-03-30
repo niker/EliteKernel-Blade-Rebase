@@ -113,6 +113,26 @@ static unsigned int use_suspend_delay = 1;
 int enable_oc = 0;
 #endif
 
+<<<<<<< HEAD
+=======
+// maxwen: see tegra_cpu_init
+// values can be changed in sysfs interface of cpufreq
+// for scaling_max_freq_limit
+static inline unsigned int get_cpu_freq_limit(unsigned int cpu)
+{
+	BUG_ON(cpu > 3);
+	if(tegra_pmqos_cpu_freq_limits[cpu]!=0){
+		return tegra_pmqos_cpu_freq_limits[cpu];
+	}
+	return tegra_cpu_freq_max(cpu);
+}
+
+unsigned int tegra_get_suspend_boost_freq(void)
+{
+	return min((unsigned int)CPU_FREQ_BOOST, get_cpu_freq_limit(0));
+}
+
+>>>>>>> 2582739... tegra: respect active frequency caps for suspend boost
 /* maximum cpu freq */
 unsigned int tegra_cpu_freq_max(unsigned int cpu)
 {
@@ -2478,20 +2498,20 @@ static void tegra_cpufreq_late_resume(struct early_suspend *h)
 
 	// boost at the beginning of the resume
 	pr_info("tegra_cpufreq_late_resume: boost cpu freq\n");
-	tegra_update_cpu_speed(CPU_FREQ_BOOST);
+	tegra_update_cpu_speed(tegra_get_suspend_boost_freq());
 	// now disable all speed changes until finished
 	in_earlysuspend = true;
-	pm_qos_update_request(&boost_cpu_freq_req, (s32)CPU_FREQ_BOOST);
+	pm_qos_update_request(&boost_cpu_freq_req, (s32)tegra_get_suspend_boost_freq());
 }
 
 static void tegra_cpufreq_performance_early_suspend(struct early_suspend *h)
 {
 	// this is the first suspend handler
 	pr_info("tegra_cpufreq_performance_early_suspend: boost cpu freq\n");
-	tegra_update_cpu_speed(CPU_FREQ_BOOST);
+	tegra_update_cpu_speed(tegra_get_suspend_boost_freq());
 	// now disable all speed changes until finished
 	in_earlysuspend = true;
-	pm_qos_update_request(&boost_cpu_freq_req, (s32)CPU_FREQ_BOOST);	
+	pm_qos_update_request(&boost_cpu_freq_req, (s32)tegra_get_suspend_boost_freq());	
 }
 
 static void tegra_cpufreq_performance_late_resume(struct early_suspend *h)
