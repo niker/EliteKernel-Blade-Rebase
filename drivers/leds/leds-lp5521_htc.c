@@ -863,11 +863,7 @@ static void led_powerkey_work_func(struct work_struct *work)
 
 	D("%s, current_mode: %d, backlight_mode: %d\n", __func__, current_mode, backlight_mode);
 	pdata = client->dev.platform_data;
-<<<<<<< HEAD
-	if( current_mode == 0  )
-=======
 	if(current_mode == 0 )
->>>>>>> c1ab035... led: another derp
 		lp5521_led_enable(client);
 	mutex_lock(&led_mutex);
 	if (backlight_mode >= 2) {
