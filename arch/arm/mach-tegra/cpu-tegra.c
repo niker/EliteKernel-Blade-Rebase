@@ -55,23 +55,21 @@
 extern int mpdecision_gmode_notifier(void);
 #endif
 
-<<<<<<< HEAD
 // make these vals modifiable in realtime
 unsigned int T3_CPU_MIN_FREQ = DEF_T3_CPU_MIN_FREQ;
 
 /* EliteKernel Extreme Powersaving*/
 unsigned int tegra_pmqos_powersave = 0;
 unsigned int tegra_pmqos_audio = 0;
-=======
+
 #ifdef CONFIG_TEGRA_CPUQUIET
 extern void tegra_cpuquiet_force_gmode(void);
 #endif
 
->>>>>>> 423cdb0... tegra: use cpuquiet force gmode on resume
 unsigned int tegra_pmqos_boost_freq = BOOST_CPU_FREQ_MIN;
 
 /* frequency cap used during suspend (screen off)*/
-static unsigned int suspend_cap_freq = CAP_CPU_FREQ_MAX;
+static unsigned int suspend_cap_freq = SUSPEND_CPU_FREQ_MAX;
 
 // maxwen: assumes 4 cores!
 unsigned int tegra_pmqos_cpu_freq_limits[CONFIG_NR_CPUS] = {0, 0, 0, 0};
@@ -671,12 +669,7 @@ int tegra_update_cpu_speed(unsigned long rate)
              */
              status = mpdecision_gmode_notifier();
              if (status == 0)
-<<<<<<< HEAD
-             	pr_err("%s: couldn't switch to gmode (freq)", __func__ );
-
-=======
              	pr_err("tegra_update_cpu_speed: %s: couldn't switch to gmode (freq)", __func__ );
->>>>>>> 423cdb0... tegra: use cpuquiet force gmode on resume
 #endif
 			/* restore the target frequency, and
 			 * let the rest of the function handle
