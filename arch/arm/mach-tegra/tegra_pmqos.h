@@ -29,6 +29,14 @@
 #define SUSPEND_CPU_FREQ_MAX	475000
 #define CPU_FREQ_BOOST	1400000
 
+#define CPU_FREQ_MAX_0 1700000
+#define CPU_FREQ_MAX 1600000
+#define CPU_FREQ_MAX_OC 1700000
+
+// sysfs to change available
+#define SUSPEND_CPU_FREQ_MAX 475000
+#define SUSPEND_CPU_NUM_MAX 2
+
 
 #define DEF_T3_CPU_MIN_FREQ     51000
 #define AUD_T3_CPU_MIN_FREQ     102000
