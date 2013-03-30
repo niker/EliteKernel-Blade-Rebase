@@ -27,7 +27,7 @@
 
 /* Default constants */
 #define SUSPEND_CPU_FREQ_MAX	475000
-#define BOOST_CPU_FREQ_MIN	1400000
+#define CPU_FREQ_BOOST	1400000
 
 
 #define DEF_T3_CPU_MIN_FREQ     51000
