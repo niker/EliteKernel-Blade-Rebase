@@ -36,14 +36,14 @@
 	#define D(x...)
 #endif
 
-<<<<<<< HEAD
+
 #ifdef LEDS_LP5521_HTC_multiplier
 #include <linux/leds-lp5521_htc_multiplier.h>
 #endif
-=======
+
 #define I(x...) pr_info("[LED]" x)
 #define E(x...) pr_err("[LED]" x)
->>>>>>> 880e625... led: cleanup that log mess
+
 
 static int led_rw_delay;
 static int current_state, current_blink, current_time;
@@ -1348,12 +1348,6 @@ static ssize_t lp5521_led_currents_store(struct device *dev,
 	uint8_t data = 0x00;
 	int val, ret;
 
-<<<<<<< HEAD
-	sscanf(buf, "%d", &val);
-	I(" %s , val = %d\n" , __func__, val);
-	if (val < 0 || val > 255)
-		return -EINVAL;
-=======
 	ret = sscanf(buf, "%d", &val);
 
 	if (ret!=1 || val < 0 || val > 3)
@@ -1361,7 +1355,6 @@ static ssize_t lp5521_led_currents_store(struct device *dev,
 
 	D("%s , val = %d\n" , __func__, val);
 
->>>>>>> 880e625... led: cleanup that log mess
 	current_currents = val;
 	led_cdev = (struct led_classdev *)dev_get_drvdata(dev);
 	ldata = container_of(led_cdev, struct lp5521_led, cdev);
