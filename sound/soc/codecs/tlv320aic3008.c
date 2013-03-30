@@ -444,27 +444,18 @@ void aic3008_votecpuminfreq(bool bflag)
     boldCPUMinReq = bflag;
     if (bflag)
     {
-<<<<<<< HEAD
 		tegra_pmqos_audio = 1;
 		update_tegra_pmqos_freqs();
         set_aud_cpu_minfreq(T3_CPU_MIN_FREQ);
-        AUD_INFO("VoteMinFreqS:%d\n", T3_CPU_MIN_FREQ);
+        AUD_DBG("VoteMinFreqS:%d\n", T3_CPU_MIN_FREQ);
     }
     else
     {
 		tegra_pmqos_audio = 0;
 		update_tegra_pmqos_freqs();
         set_aud_cpu_minfreq(PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
-        AUD_INFO("VoteMinFreqE:%d\n", PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
-=======
-        pm_qos_update_request(&aud_cpu_minfreq_req, (s32)audio_min_freq);
-        AUD_DBG("VoteMinFreqS:%d\n", audio_min_freq);
-    }
-    else
-    {
-        pm_qos_update_request(&aud_cpu_minfreq_req, (s32)PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
         AUD_DBG("VoteMinFreqE:%d\n", PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
->>>>>>> 0401047... audio: make less chatty by default
+
     }
     return;
 }
