@@ -27,7 +27,7 @@
 
 /* Default constants */
 #define SUSPEND_CPU_FREQ_MAX	475000
-#define CPU_FREQ_BOOST	1400000
+#define CPU_FREQ_BOOST	1150000
 
 #define CPU_FREQ_MAX_0 1700000
 #define CPU_FREQ_MAX 1600000
