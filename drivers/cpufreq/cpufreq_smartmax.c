@@ -120,11 +120,7 @@ static bool ramp_up_during_boost = true;
  * external boost interface - boost if duration is written
  * to sysfs for boost_duration
  */
-<<<<<<< HEAD
-static unsigned int boost_freq = 1150000;
-=======
 static unsigned int boost_freq = 760000;
->>>>>>> f81abd8... smartmax: reduced boost freq now with ramp_up_during_boost
 static bool boost = true;
 
 /* in nsecs */
