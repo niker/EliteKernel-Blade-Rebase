@@ -68,11 +68,9 @@ unsigned int tegra_pmqos_audio = 0;
 extern void tegra_cpuquiet_force_gmode(void);
 #endif
 
-<<<<<<< HEAD
 unsigned int tegra_pmqos_boost_freq = CPU_FREQ_BOOST;
-=======
 struct work_struct ril_suspend_resume_work;
->>>>>>> a51e54d... tegra: readded ril_boost - may solve the screen not turning on on incoming calls issue
+
 
 /* frequency cap used during suspend (screen off)*/
 static unsigned int suspend_cap_freq = SUSPEND_CPU_FREQ_MAX;
@@ -315,7 +313,6 @@ static unsigned int user_cap_speed(unsigned int requested_speed)
 	return requested_speed;
 }
 
-<<<<<<< HEAD
 static unsigned int pmqos_cap_speed(unsigned int requested_speed)
 {
 	unsigned int ret = requested_speed;
@@ -330,12 +327,10 @@ static unsigned int pmqos_cap_speed(unsigned int requested_speed)
 	return ret;
 }
 
-=======
 /* called from ril 
 this fixes the "screen not turning on issue" on incoming calls!
 the problem is that else the device may go into suspend again
 because min freq is 0 */
->>>>>>> a51e54d... tegra: readded ril_boost - may solve the screen not turning on on incoming calls issue
 static int ril_boost = 0;
 
 static int ril_boost_set(const char *arg, const struct kernel_param *kp)
