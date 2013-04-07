@@ -83,11 +83,7 @@ static unsigned int min_cpu_load;
  * The minimum amount of time in nsecs to spend at a frequency before we can ramp up.
  * Notice we ignore this when we are below the ideal frequency.
  */
-<<<<<<< HEAD
 #define DEFAULT_UP_RATE 60000
-=======
-#define DEFAULT_UP_RATE 100000
->>>>>>> 91b1562... smartmax: allow ramp_up steps during boost
 static unsigned int up_rate;
 
 /*
@@ -114,11 +110,7 @@ static bool sync_cpu_downscale = false;
  * external boost interface - boost if duration is written
  * to sysfs for boost_duration
  */
-<<<<<<< HEAD
 static unsigned int boost_freq = 1150000;
-=======
-static unsigned int boost_freq = 910000;
->>>>>>> 91b1562... smartmax: allow ramp_up steps during boost
 static bool boost = true;
 
 /* in nsecs */
