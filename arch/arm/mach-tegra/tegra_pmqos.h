@@ -38,6 +38,10 @@
 #define SUSPEND_CPU_FREQ_MAX 475000
 #define SUSPEND_CPU_NUM_MAX 2
 
+// f_mtp.c
+#define MTP_CPU_FREQ_MIN 1150000
+#define MTP_ONLINE_CPUS_MIN 2
+
 
 #define DEF_T3_CPU_MIN_FREQ     51000
 #define AUD_T3_CPU_MIN_FREQ     102000
@@ -52,11 +56,9 @@
 extern unsigned int T3_CPU_MIN_FREQ;
 extern unsigned int tegra_pmqos_boost_freq;
 extern unsigned int tegra_pmqos_cpu_freq_limits[];
-<<<<<<< HEAD
-=======
+
 extern unsigned int tegra_cpu_freq_max(unsigned int cpu);
 extern unsigned int tegra_get_suspend_boost_freq(void);
->>>>>>> 2582739... tegra: respect active frequency caps for suspend boost
 
 /* EliteKernel Extreme Powersaving*/
 extern unsigned int tegra_pmqos_powersave;
