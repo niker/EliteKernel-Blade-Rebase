@@ -70,11 +70,7 @@ static unsigned int ramp_down_step;
 /*
  * CPU freq will be increased if measured load > max_cpu_load;
  */
-<<<<<<< HEAD
 #define DEFAULT_MAX_CPU_LOAD 90
-=======
-#define DEFAULT_MAX_CPU_LOAD 80
->>>>>>> ae27e9b... smartmax: added ramp_up_during_boost tunable
 static unsigned int max_cpu_load;
 
 /*
