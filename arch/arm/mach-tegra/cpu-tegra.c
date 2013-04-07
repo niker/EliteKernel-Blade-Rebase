@@ -113,26 +113,7 @@ static unsigned int use_suspend_delay = 1;
 int enable_oc = 0;
 #endif
 
-<<<<<<< HEAD
-=======
-// maxwen: see tegra_cpu_init
-// values can be changed in sysfs interface of cpufreq
-// for scaling_max_freq_limit
-static inline unsigned int get_cpu_freq_limit(unsigned int cpu)
-{
-	BUG_ON(cpu > 3);
-	if(tegra_pmqos_cpu_freq_limits[cpu]!=0){
-		return tegra_pmqos_cpu_freq_limits[cpu];
-	}
-	return tegra_cpu_freq_max(cpu);
-}
 
-unsigned int tegra_get_suspend_boost_freq(void)
-{
-	return min((unsigned int)CPU_FREQ_BOOST, get_cpu_freq_limit(0));
-}
-
->>>>>>> 2582739... tegra: respect active frequency caps for suspend boost
 /* maximum cpu freq */
 unsigned int tegra_cpu_freq_max(unsigned int cpu)
 {
@@ -155,6 +136,11 @@ static inline unsigned int get_cpu_freq_limit(unsigned int cpu)
 		return tegra_pmqos_cpu_freq_limits[cpu];
 	}
 	return tegra_cpu_freq_max(cpu);
+}
+
+unsigned int tegra_get_suspend_boost_freq(void)
+{
+	return min((unsigned int)CPU_FREQ_BOOST, get_cpu_freq_limit(0));
 }
 
 static bool force_policy_max;

@@ -25,20 +25,8 @@
  *
  */
 
-<<<<<<< HEAD
 /* Default constants */
-=======
-/* in kHz */
-#define CPU_FREQ_MAX_0		1700000
-#define CPU_FREQ_MAX		1600000
-#define CPU_FREQ_MAX_OC		1700000
-/* any caps will be respected */
-#define CPU_FREQ_BOOST		1600000
-#define T3_CPU_MIN_FREQ     51000
-#define T3_LP_MAX_FREQ     	475000
 
-// sysfs to change available
->>>>>>> 2582739... tegra: respect active frequency caps for suspend boost
 #define SUSPEND_CPU_FREQ_MAX	475000
 #define CPU_FREQ_BOOST	1150000
 
