@@ -72,8 +72,6 @@
 #include "dvfs.h"
 #include "cpu-tegra.h"
 
-#include "tegra_pmqos.h"
-
 struct suspend_context {
 	/*
 	 * The next 7 values are referenced by offset in __restart_plls
@@ -1030,9 +1028,9 @@ static void tegra_suspend_finish(void)
 	}
 
 	if (pdata && pdata->cpu_resume_boost) {
-		int ret = tegra_suspended_target(tegra_get_suspend_boost_freq());
+		int ret = tegra_suspended_target(pdata->cpu_resume_boost);
 		pr_info("tegra_suspend_finish: resume CPU boost to %u KHz: %s (%d)\n",
-			tegra_get_suspend_boost_freq(), ret ? "Failed" : "OK", ret);
+			pdata->cpu_resume_boost, ret ? "Failed" : "OK", ret);
 	}
 
 noboost:

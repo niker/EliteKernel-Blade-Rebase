@@ -71,10 +71,11 @@ extern void tegra_cpuquiet_force_gmode(void);
 unsigned int tegra_pmqos_boost_freq = CPU_FREQ_BOOST;
 struct work_struct ril_suspend_resume_work;
 
-
 /* frequency cap used during suspend (screen off)*/
 static unsigned int suspend_cap_freq = SUSPEND_CPU_FREQ_MAX;
 static unsigned int suspend_cap_cpu_num = SUSPEND_CPU_NUM_MAX;
+/* disable speed changes during early suspend and resume handlers */
+static bool in_earlysuspend = false;
 
 // maxwen: assumes 4 cores!
 unsigned int tegra_pmqos_cpu_freq_limits[CONFIG_NR_CPUS] = {0, 0, 0, 0};
@@ -93,28 +94,9 @@ static DEFINE_MUTEX(tegra_cpu_lock);
 static bool is_suspended;
 static int suspend_index;
 
-#ifdef CONFIG_HAS_EARLYSUSPEND
-/* put early_suspend/late_resume handlers here for the display in order
- * to keep the code out of the display driver, keeping it closer to upstream
- */
-struct early_suspend tegra_cpufreq_early_suspender;
-struct early_suspend tegra_cpufreq_performance_early_suspender;
-static struct pm_qos_request_list cap_cpu_freq_req;
-static struct pm_qos_request_list cap_cpu_num_req;
-static struct pm_qos_request_list boost_cpu_freq_req;
-static struct workqueue_struct *suspend_wq;
-static struct delayed_work suspend_work;
-#define SUSPEND_DELAY_MS 800
-static unsigned int suspend_delay = SUSPEND_DELAY_MS;
-static unsigned int use_suspend_delay = 1;
-static void tegra_cancel_delayed_suspend_work(void);
-static bool in_earlysuspend = false;
-#endif
-
 #ifdef CONFIG_TEGRA3_VARIANT_CPU_OVERCLOCK
 int enable_oc = 0;
 #endif
-
 
 /* maximum cpu freq */
 unsigned int tegra_cpu_freq_max(unsigned int cpu)
@@ -225,60 +207,6 @@ static struct kernel_param_ops suspend_cap_cpu_num_ops = {
 };
 module_param_cb(suspend_cap_cpu_num, &suspend_cap_cpu_num_ops, &suspend_cap_cpu_num, 0644);
 
-#ifdef CONFIG_HAS_EARLYSUSPEND
-static int use_suspend_delay_set(const char *arg, const struct kernel_param *kp)
-{
-	unsigned int tmp;
-	
-	if (1 != sscanf(arg, "%u", &tmp))
-		return -EINVAL;
-
-	if (tmp < 0 || tmp > 1)
-		return -EINVAL;
-			
-    use_suspend_delay = tmp;
-    pr_info("use_suspend_delay %d\n", use_suspend_delay);
-	return 0;
-}
-
-static int use_suspend_delay_get(char *buffer, const struct kernel_param *kp)
-{
-	return param_get_uint(buffer, kp);
-}
-
-static struct kernel_param_ops use_suspend_delay_ops = {
-	.set = use_suspend_delay_set,
-	.get = use_suspend_delay_get,
-};
-module_param_cb(use_suspend_delay, &use_suspend_delay_ops, &use_suspend_delay, 0644);
-
-static int suspend_delay_set(const char *arg, const struct kernel_param *kp)
-{
-	unsigned int tmp;
-	
-	if (1 != sscanf(arg, "%u", &tmp))
-		return -EINVAL;
-
-	if (tmp < 0 || tmp > 1)
-		return -EINVAL;
-			
-    suspend_delay = tmp;
-    pr_info("suspend_delay %d\n", suspend_delay);
-	return 0;
-}
-
-static int suspend_delay_get(char *buffer, const struct kernel_param *kp)
-{
-	return param_get_uint(buffer, kp);
-}
-
-static struct kernel_param_ops suspend_delay_ops = {
-	.set = suspend_delay_set,
-	.get = suspend_delay_get,
-};
-module_param_cb(suspend_delay, &suspend_delay_ops, &suspend_delay, 0644);
-#endif
-
 static unsigned int cpu_user_cap = 0;
 
 static inline void _cpu_user_cap_set_locked(void)
@@ -353,10 +281,6 @@ static unsigned int pmqos_cap_speed(unsigned int requested_speed)
 	return ret;
 }
 
-/* called from ril 
-this fixes the "screen not turning on issue" on incoming calls!
-the problem is that else the device may go into suspend again
-because min freq is 0 */
 static int ril_boost = 0;
 
 static int ril_boost_set(const char *arg, const struct kernel_param *kp)
@@ -786,7 +710,11 @@ int tegra_update_cpu_speed(unsigned long rate)
 	unsigned long rate_save = rate;
 	int status = 1;
 #endif
-
+	
+	// dont allow changes while in early suspend boost mode
+	if (in_earlysuspend)
+		return ret;
+		
 	freqs.old = tegra_getspeed(0);
 	freqs.new = rate;
 
@@ -2165,6 +2093,10 @@ int tegra_cpu_set_speed_cap(unsigned int *speed_cap)
     speed_wocap = new_speed;
 #endif
 
+	// dont allow changes while in early suspend boost mode
+	if (in_earlysuspend)
+		return ret;
+
 	if (is_suspended)
 		return -EBUSY;
 
@@ -2315,6 +2247,10 @@ static int tegra_target(struct cpufreq_policy *policy,
 	unsigned int freq;
 	int ret = 0;
 
+	// dont allow changes while in early suspend boost mode
+	if (in_earlysuspend)
+		return ret;
+
 	mutex_lock(&tegra_cpu_lock);
 
 	ret = cpufreq_frequency_table_target(policy, freq_table, target_freq,
@@ -2336,22 +2272,28 @@ _out:
 	return ret;
 }
 
+#ifdef CONFIG_HAS_EARLYSUSPEND
+/* put early_suspend/late_resume handlers here for the display in order
+ * to keep the code out of the display driver, keeping it closer to upstream
+ */
+struct early_suspend tegra_cpufreq_early_suspender;
+struct early_suspend tegra_cpufreq_performance_early_suspender;
+static struct pm_qos_request_list cap_cpu_freq_req;
+static struct pm_qos_request_list cap_cpu_num_req;
+static struct pm_qos_request_list boost_cpu_freq_req;
+#endif
+
 static int tegra_pm_notify(struct notifier_block *nb, unsigned long event,
 	void *dummy)
 {
-#ifdef CONFIG_HAS_EARLYSUSPEND
-	// must be outside of tegra_cpu_lock mutex!
-	if (event == PM_SUSPEND_PREPARE) {
-		tegra_cancel_delayed_suspend_work();
-	}
-#endif
-	
 	mutex_lock(&tegra_cpu_lock);
 	if (event == PM_SUSPEND_PREPARE) {
 		unsigned int freq;
 		is_suspended = true;
 		freq=freq_table[suspend_index].frequency;
+#if CPU_FREQ_DEBUG
 		pr_info("tegra_pm_notify: suspend: setting frequency to %d kHz\n", freq);
+#endif
 		tegra_update_cpu_speed(freq);
 		tegra_auto_hotplug_governor(freq, true);
 	} else if (event == PM_POST_SUSPEND) {
@@ -2360,7 +2302,9 @@ static int tegra_pm_notify(struct notifier_block *nb, unsigned long event,
 		tegra_cpu_edp_init(true);
 		
 		tegra_cpu_set_speed_cap(&freq);
+#if CPU_FREQ_DEBUG
 		pr_info("tegra_pm_notify: resume: restoring frequency to %d kHz\n", freq);
+#endif
 	}
 	mutex_unlock(&tegra_cpu_lock);
 	return NOTIFY_OK;
@@ -2412,9 +2356,7 @@ static int tegra_cpu_init(struct cpufreq_policy *policy)
     /* restore saved cpu frequency */
     if (policy->cpu > 0) {
 		policy->max = get_cpu_freq_limit(policy->cpu);
-		policy->min = T3_CPU_MIN_FREQ;
-		// maxwen: WTF why?
-		//tegra_update_cpu_speed(policy->max);
+		tegra_update_cpu_speed(policy->max);
 #if CPU_FREQ_DEBUG
 		pr_info("cpu-tegra_cpufreq: restored cpu[%d]'s freq: %u\n", policy->cpu, policy->max);
 #endif
@@ -2471,44 +2413,20 @@ static struct cpufreq_driver tegra_cpufreq_driver = {
 
 #ifdef CONFIG_HAS_EARLYSUSPEND
 
-static void tegra_delayed_suspend_work(struct work_struct *work)
-{
-	if(!in_earlysuspend)
-		return;
-
-	pr_info("tegra_delayed_suspend_work: clean cpu freq boost\n");
-	in_earlysuspend = false;
-	pm_qos_update_request(&boost_cpu_freq_req, (s32)PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
-	
-	pr_info("tegra_delayed_suspend_work: cap cpu freq to %d\n", suspend_cap_freq);
-	pm_qos_update_request(&cap_cpu_freq_req, (s32)suspend_cap_freq);
-	
-	if (suspend_cap_freq > T3_LP_MAX_FREQ) {
-		pr_info("tegra_delayed_suspend_work: cap max cpu to %d\n", suspend_cap_cpu_num);
-		pm_qos_update_request(&cap_cpu_num_req, (s32)suspend_cap_cpu_num);
-	}
-}
-
-static void tegra_cancel_delayed_suspend_work(void)
-{
-	// delayed suspend worker hasnt run so far
-	if(in_earlysuspend){
-		pr_info("tegra_cancel_delayed_suspend_work\n");
-		cancel_delayed_work_sync(&suspend_work);
-		tegra_delayed_suspend_work(NULL);
-	}
-}
-
 static void tegra_cpufreq_early_suspend(struct early_suspend *h)
 {
 	// this is the last suspend handler
-	// queue suspend_cap_handler to avoid caping is causing
-	// hickups e.g. when playing audio
-	if (use_suspend_delay){
-		pr_info("tegra_cpufreq_early_suspend: queue suspend handler\n");
-		queue_delayed_work(suspend_wq, &suspend_work, msecs_to_jiffies(suspend_delay));
-	} else
-		tegra_delayed_suspend_work(NULL);
+	pr_info("tegra_cpufreq_early_suspend: clean cpu freq boost\n");
+	in_earlysuspend = false;
+	pm_qos_update_request(&boost_cpu_freq_req, (s32)PM_QOS_CPU_FREQ_MIN_DEFAULT_VALUE);
+	
+	pr_info("tegra_cpufreq_early_suspend: cap cpu freq to %d\n", suspend_cap_freq);
+	pm_qos_update_request(&cap_cpu_freq_req, (s32)suspend_cap_freq);
+	
+	if (suspend_cap_freq > T3_LP_MAX_FREQ) {
+		pr_info("tegra_cpufreq_early_suspend: cap max cpu to %d\n", suspend_cap_cpu_num);
+		pm_qos_update_request(&cap_cpu_num_req, (s32)suspend_cap_cpu_num);
+	}
 }
 
 static void tegra_cpufreq_late_resume(struct early_suspend *h)
@@ -2526,20 +2444,20 @@ static void tegra_cpufreq_late_resume(struct early_suspend *h)
 
 	// boost at the beginning of the resume
 	pr_info("tegra_cpufreq_late_resume: boost cpu freq\n");
-	tegra_update_cpu_speed(tegra_get_suspend_boost_freq());
-
+	tegra_update_cpu_speed(CPU_FREQ_BOOST);
+	// now disable all speed changes until finished
 	in_earlysuspend = true;
-	pm_qos_update_request(&boost_cpu_freq_req, (s32)tegra_get_suspend_boost_freq());
+	pm_qos_update_request(&boost_cpu_freq_req, (s32)CPU_FREQ_BOOST);
 }
 
 static void tegra_cpufreq_performance_early_suspend(struct early_suspend *h)
 {
 	// this is the first suspend handler
 	pr_info("tegra_cpufreq_performance_early_suspend: boost cpu freq\n");
-	tegra_update_cpu_speed(tegra_get_suspend_boost_freq());
-
+	tegra_update_cpu_speed(CPU_FREQ_BOOST);
+	// now disable all speed changes until finished
 	in_earlysuspend = true;
-	pm_qos_update_request(&boost_cpu_freq_req, (s32)tegra_get_suspend_boost_freq());	
+	pm_qos_update_request(&boost_cpu_freq_req, (s32)CPU_FREQ_BOOST);	
 }
 
 static void tegra_cpufreq_performance_late_resume(struct early_suspend *h)
@@ -2551,7 +2469,6 @@ static void tegra_cpufreq_performance_late_resume(struct early_suspend *h)
 }
 
 #endif
-
 static void ril_suspend_resume_worker(struct work_struct *w)
 {
 #ifdef CONFIG_TEGRA_CPUQUIET
@@ -2607,23 +2524,14 @@ static int __init tegra_cpufreq_init(void)
 	tegra_cpufreq_performance_early_suspender.resume = tegra_cpufreq_performance_late_resume;
 	tegra_cpufreq_performance_early_suspender.level = 0;
 	register_early_suspend(&tegra_cpufreq_performance_early_suspender);
-	
-	suspend_wq = alloc_workqueue(
-		"suspend_wq", WQ_UNBOUND | WQ_RESCUER | WQ_FREEZABLE, 1);
-
-	if (!suspend_wq)
-		return -ENOMEM;
-
-	INIT_DELAYED_WORK(&suspend_work, tegra_delayed_suspend_work);
 #endif
 
 
 	ret = cpufreq_register_notifier(
 		&tegra_cpufreq_policy_nb, CPUFREQ_POLICY_NOTIFIER);
-	if (ret){
-		destroy_workqueue(suspend_wq);
+	if (ret)
 		return ret;
-	}
+
 	return cpufreq_register_driver(&tegra_cpufreq_driver);
 }
 
@@ -2639,8 +2547,6 @@ static void __exit tegra_cpufreq_exit(void)
 			
 	unregister_early_suspend(&tegra_cpufreq_performance_early_suspender);
 	unregister_early_suspend(&tegra_cpufreq_early_suspender);
-	
-	destroy_workqueue(suspend_wq);
 #endif
 	cpufreq_unregister_driver(&tegra_cpufreq_driver);
 	cpufreq_unregister_notifier(
