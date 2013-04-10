@@ -553,6 +553,9 @@ static int tegra_cpu_edp_notify(
 
 		cpu_speed = tegra_getspeed(0);
 		new_speed = edp_governor_speed(cpu_speed);
+		#if CPU_FREQ_DEBUG
+		pr_info("DBG_NS(01): %d kHz\n", new_speed);
+#endif
 		if (new_speed < cpu_speed) {
 			ret = tegra_cpu_set_speed_cap(NULL);
 			pr_info("tegra_cpu_edp_notify:%s cpu:%d force EDP limit %u kHz"
@@ -911,10 +914,25 @@ EXPORT_SYMBOL (mips_aggressive_factor);
 static unsigned int get_scaled_freq (unsigned int target_freq)
 {
     /* chip-dependent, such as thermal throttle, edp, and user-defined freq. cap */
+    #if CPU_FREQ_DEBUG
+		pr_info("DBG_TF(01): %d kHz\n", target_freq);
+	#endif
 	target_freq = pmqos_cap_speed (target_freq);
+    #if CPU_FREQ_DEBUG
+		pr_info("DBG_TF(02): %d kHz\n", target_freq);
+	#endif
     target_freq = tegra_throttle_governor_speed (target_freq);
-	target_freq = edp_governor_speed (target_freq);
+    #if CPU_FREQ_DEBUG
+		pr_info("DBG_TF(03): %d kHz\n", target_freq);
+	#endif
+	/*target_freq = edp_governor_speed (target_freq);
+    #if CPU_FREQ_DEBUG
+		pr_info("DBG_TF(04): %d kHz\n", target_freq);
+	#endif*/
 	target_freq = user_cap_speed (target_freq);
+	#if CPU_FREQ_DEBUG
+		pr_info("DBG_TF(05): %d kHz\n", target_freq);
+	#endif
 	
     return target_freq;
 }
@@ -2070,6 +2088,7 @@ int tegra_cpu_set_speed_cap(unsigned int *speed_cap)
 {
 	int ret = 0;
     unsigned int new_speed = tegra_cpu_highest_speed();
+    
     unsigned int curr_speed = tegra_getspeed(0);
     
 #if defined(CONFIG_BEST_TRADE_HOTPLUG)
@@ -2082,6 +2101,9 @@ int tegra_cpu_set_speed_cap(unsigned int *speed_cap)
 
     if (new_speed < min_speed) {
         new_speed = min_speed;
+        #if CPU_FREQ_DEBUG
+		pr_info("DBG_NS(02): %d kHz\n", new_speed);
+#endif
 
         /* all cpus' frequency requests are < min_speed
          * let cpu0 be the kicker
@@ -2101,6 +2123,9 @@ int tegra_cpu_set_speed_cap(unsigned int *speed_cap)
 		return -EBUSY;
 
 	new_speed = get_scaled_freq(new_speed);
+	#if CPU_FREQ_DEBUG
+		pr_info("DBG_NS(03): %d kHz\n", new_speed);
+#endif
 
 #if defined(CONFIG_BEST_TRADE_HOTPLUG)
     /* do a best trade for power/performance,
@@ -2145,9 +2170,17 @@ int tegra_cpu_set_speed_cap(unsigned int *speed_cap)
                                                    new_speed,
                                                    BTHP_DECISION (ANY)
                                                    );
+                                                   #if CPU_FREQ_DEBUG
+		pr_info("DBG_NS(04): %d kHz\n", new_speed);
+#endif
 
                     if (new_speed < speed_before_bthp)
+                    {
                         new_speed = speed_before_bthp;
+                        #if CPU_FREQ_DEBUG
+		pr_info("DBG_NS(05): %d kHz\n", new_speed);
+#endif
+                    }
                 }
             }
 
@@ -2185,7 +2218,13 @@ int tegra_suspended_target(unsigned int target_freq)
 
 	/* apply only "hard" caps */
 	new_speed = tegra_throttle_governor_speed(new_speed);
+	#if CPU_FREQ_DEBUG
+		pr_info("DBG_NS(06): %d kHz\n", new_speed);
+#endif
 	new_speed = edp_governor_speed(new_speed);
+	#if CPU_FREQ_DEBUG
+		pr_info("DBG_NS(07): %d kHz\n", new_speed);
+#endif
 
 	return tegra_update_cpu_speed(new_speed);
 }
