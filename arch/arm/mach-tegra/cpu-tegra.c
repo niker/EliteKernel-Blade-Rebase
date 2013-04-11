@@ -2298,15 +2298,6 @@ static int tegra_target(struct cpufreq_policy *policy,
 	unsigned int freq;
 	int ret = 0;
 
-<<<<<<< HEAD
-	// dont allow changes while in early suspend boost mode
-	if (in_earlysuspend)
-		return ret;
-
-	mutex_lock(&tegra_cpu_lock);
-
-=======
->>>>>>> f397eb2... cpuquiet: disable delayed g-mode switching for governor targets
 	ret = cpufreq_frequency_table_target(policy, freq_table, target_freq,
 		relation, &idx);
 	if (ret)
