@@ -925,10 +925,14 @@ static unsigned int get_scaled_freq (unsigned int target_freq)
     #if CPU_FREQ_DEBUG
 		pr_info("DBG_TF(03): %d kHz\n", target_freq);
 	#endif
-	/*target_freq = edp_governor_speed (target_freq);
+	unsigned int edp_freq = edp_governor_speed (target_freq);
+	if(edp_freq >= 1000)
+	{
+		target_freq = edp_governor_speed (target_freq);
+	}
     #if CPU_FREQ_DEBUG
 		pr_info("DBG_TF(04): %d kHz\n", target_freq);
-	#endif*/
+	#endif
 	target_freq = user_cap_speed (target_freq);
 	#if CPU_FREQ_DEBUG
 		pr_info("DBG_TF(05): %d kHz\n", target_freq);
