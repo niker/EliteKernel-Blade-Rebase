@@ -104,11 +104,11 @@ unsigned int tegra_cpu_freq_max(unsigned int cpu)
 {
 #ifdef CONFIG_TEGRA3_VARIANT_CPU_OVERCLOCK
 	if (enable_oc)
-		return CPU_FREQ_MAX_OC;
+		return T3_CPU_FREQ_MAX_OC;
 #endif	
 	if (cpu==0)
-		return CPU_FREQ_MAX_0;
-	return CPU_FREQ_MAX;
+		return T3_CPU_FREQ_MAX_0;
+	return T3_CPU_FREQ_MAX;
 }
 
 // maxwen: see tegra_cpu_init
@@ -137,21 +137,6 @@ unsigned int tegra_get_suspend_boost_freq(void)
 	return min((unsigned int)T3_CPU_FREQ_BOOST, get_cpu_freq_limit(0));
 }
 
-<<<<<<< HEAD
-=======
-/* maximum cpu freq */
-unsigned int tegra_cpu_freq_max(unsigned int cpu)
-{
-#ifdef CONFIG_TEGRA3_VARIANT_CPU_OVERCLOCK
-	if (enable_oc)
-		return T3_CPU_FREQ_MAX_OC;
-#endif	
-	if (cpu==0)
-		return T3_CPU_FREQ_MAX_0;
-	return T3_CPU_FREQ_MAX;
-}
-
->>>>>>> 97d79e8... tegra: added scaling_min_freq support
 static bool force_policy_max;
 
 static int force_policy_max_set(const char *arg, const struct kernel_param *kp)
@@ -2424,13 +2409,9 @@ static int tegra_cpu_init(struct cpufreq_policy *policy)
     /* restore saved cpu frequency */
     if (policy->cpu > 0) {
 		policy->max = get_cpu_freq_limit(policy->cpu);
-<<<<<<< HEAD
-		tegra_update_cpu_speed(policy->max);
-=======
 		policy->min = get_cpu_freq_limit_min(policy->cpu);
-		// maxwen: WTF why?
-		//tegra_update_cpu_speed(policy->max);
->>>>>>> 97d79e8... tegra: added scaling_min_freq support
+		tegra_update_cpu_speed(policy->max);
+
 #if CPU_FREQ_DEBUG
 		pr_info("tegra_cpu_init: restored cpu[%d]'s freq max=%u min=%u\n", policy->cpu, policy->max, policy->min);
 #endif

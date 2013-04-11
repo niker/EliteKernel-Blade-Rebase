@@ -25,25 +25,16 @@
  *
  */
 
-<<<<<<< HEAD
-/* Default constants */
-=======
-/* in kHz */
+
+
+
+
+#define SUSPEND_CPU_FREQ_MAX	475000
+#define T3_CPU_FREQ_BOOST		1150000
+
 #define T3_CPU_FREQ_MAX_0		1700000
 #define T3_CPU_FREQ_MAX			1600000
 #define T3_CPU_FREQ_MAX_OC		1700000
-/* any caps will be respected */
-#define T3_CPU_FREQ_BOOST		1600000
-#define T3_CPU_MIN_FREQ     	51000
-#define T3_LP_MAX_FREQ     		475000
->>>>>>> 97d79e8... tegra: added scaling_min_freq support
-
-#define SUSPEND_CPU_FREQ_MAX	475000
-#define CPU_FREQ_BOOST	1150000
-
-#define CPU_FREQ_MAX_0 1700000
-#define CPU_FREQ_MAX 1600000
-#define CPU_FREQ_MAX_OC 1700000
 
 // sysfs to change available
 #define SUSPEND_CPU_FREQ_MAX 475000
