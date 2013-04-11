@@ -68,7 +68,7 @@ unsigned int tegra_pmqos_audio = 0;
 extern void tegra_cpuquiet_force_gmode(void);
 #endif
 
-unsigned int tegra_pmqos_boost_freq = CPU_FREQ_BOOST;
+unsigned int tegra_pmqos_boost_freq = T3_CPU_FREQ_BOOST;
 struct work_struct ril_suspend_resume_work;
 
 /* frequency cap used during suspend (screen off)*/
@@ -2510,20 +2510,20 @@ static void tegra_cpufreq_late_resume(struct early_suspend *h)
 
 	// boost at the beginning of the resume
 	pr_info("tegra_cpufreq_late_resume: boost cpu freq\n");
-	tegra_update_cpu_speed(CPU_FREQ_BOOST);
+	tegra_update_cpu_speed(T3_CPU_FREQ_BOOST);
 	// now disable all speed changes until finished
 	in_earlysuspend = true;
-	pm_qos_update_request(&boost_cpu_freq_req, (s32)CPU_FREQ_BOOST);
+	pm_qos_update_request(&boost_cpu_freq_req, (s32)T3_CPU_FREQ_BOOST);
 }
 
 static void tegra_cpufreq_performance_early_suspend(struct early_suspend *h)
 {
 	// this is the first suspend handler
 	pr_info("tegra_cpufreq_performance_early_suspend: boost cpu freq\n");
-	tegra_update_cpu_speed(CPU_FREQ_BOOST);
+	tegra_update_cpu_speed(T3_CPU_FREQ_BOOST);
 	// now disable all speed changes until finished
 	in_earlysuspend = true;
-	pm_qos_update_request(&boost_cpu_freq_req, (s32)CPU_FREQ_BOOST);	
+	pm_qos_update_request(&boost_cpu_freq_req, (s32)T3_CPU_FREQ_BOOST);	
 }
 
 static void tegra_cpufreq_performance_late_resume(struct early_suspend *h)

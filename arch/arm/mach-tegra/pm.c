@@ -72,6 +72,8 @@
 #include "dvfs.h"
 #include "cpu-tegra.h"
 
+#include "tegra_pmqos.h"
+
 struct suspend_context {
 	/*
 	 * The next 7 values are referenced by offset in __restart_plls

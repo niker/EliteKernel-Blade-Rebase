@@ -58,11 +58,7 @@
 extern unsigned int T3_CPU_MIN_FREQ;
 extern unsigned int tegra_pmqos_boost_freq;
 extern unsigned int tegra_pmqos_cpu_freq_limits[];
-<<<<<<< HEAD
-
-=======
 extern unsigned int tegra_pmqos_cpu_freq_limits_min[];
->>>>>>> 97d79e8... tegra: added scaling_min_freq support
 extern unsigned int tegra_cpu_freq_max(unsigned int cpu);
 extern unsigned int tegra_get_suspend_boost_freq(void);
 
