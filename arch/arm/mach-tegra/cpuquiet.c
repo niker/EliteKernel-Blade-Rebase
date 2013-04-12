@@ -44,7 +44,7 @@ extern unsigned int best_core_to_turn_up (void);
 
 #define INITIAL_STATE		TEGRA_CPQ_IDLE
 #define LP_UP_DELAY_MS_DEF			90
-#define LP_DOWN_DELAY_MS_DEF		600
+#define LP_DOWN_DELAY_MS_DEF		720
 
 static struct mutex *tegra3_cpu_lock;
 static struct workqueue_struct *cpuquiet_wq;
@@ -73,7 +73,7 @@ static unsigned int max_cpus = CONFIG_NR_CPUS;
 /*
  * LPCPU hysteresis default values
  */
-#define TEGRA_CPQ_LPCPU_UP_HYS        3
+#define TEGRA_CPQ_LPCPU_UP_HYS        8
 static unsigned int tegra_cpq_lpcpu_up_hys = TEGRA_CPQ_LPCPU_UP_HYS;
 
 enum {
