@@ -100,6 +100,9 @@ mount -o async,remount,noatime,nodiratime,delalloc,noauto_da_alloc,barrier=0,nob
 echo "2048" > /sys/block/mmcblk0/bdi/read_ahead_kb;
 echo "2048" > /sys/block/mmcblk0/queue/read_ahead_kb;
 
+# enable smartdimmer
+echo "1" > /sys/devices/tegradc.0/smartdimmer/enable
+
 # feed urandom data to /dev/random to avoid system blocking (potential security risk, use at own peril!)
 /elitekernel/rngd --rng-device=/dev/urandom --random-device=/dev/random --background --feed-interval=60
 

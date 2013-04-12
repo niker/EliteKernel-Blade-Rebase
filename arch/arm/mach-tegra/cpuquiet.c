@@ -38,13 +38,13 @@
 #include "clock.h"
 #include "tegra_pmqos.h"
 
-#define CPUQUIET_DEBUG 1
+#define CPUQUIET_DEBUG 0
 
 extern unsigned int best_core_to_turn_up (void);
 
 #define INITIAL_STATE		TEGRA_CPQ_IDLE
-#define LP_UP_DELAY_MS_DEF			70
-#define LP_DOWN_DELAY_MS_DEF		1000
+#define LP_UP_DELAY_MS_DEF			90
+#define LP_DOWN_DELAY_MS_DEF		600
 
 static struct mutex *tegra3_cpu_lock;
 static struct workqueue_struct *cpuquiet_wq;
